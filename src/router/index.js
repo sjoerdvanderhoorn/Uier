@@ -1,15 +1,26 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
+import Dashboard from '@/components/Dashboard'
+import Tests from '@/components/Tests'
+import Test from '@/components/Test'
 
 Vue.use(Router)
 
 export default new Router({
-  routes: [
-    {
-      path: '/',
-      name: 'HelloWorld',
-      component: HelloWorld
-    }
-  ]
+    routes: [{
+            path: '/',
+            name: 'Dashboard',
+            component: Dashboard
+        },
+        {
+            path: '/tests',
+            name: 'Tests',
+            component: Tests
+        },
+        {
+            path: '/test/:id',
+            name: 'Test',
+            component: Test
+        }
+    ]
 })
