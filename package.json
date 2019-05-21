@@ -1,0 +1,15 @@
+{
+  "name": "Uier",
+  "version": "1.0.0",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sjoerdvanderhoorn/Uier.git"
+  },
+  "requires": true,
+  "lockfileVersion": 1,
+  "dependencies": {
+    "vue": "^2.6.10",
+    "vue-router": "^3.0.6"
+  }
+}
