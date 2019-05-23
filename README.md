@@ -2,26 +2,40 @@
 
 > A Vue.js project
 
-## Build Setup
+## Prerequisites
 
+* Install MongoDB as a service and open on port 27017
+
+## Setup
+
+**Client**
 ``` bash
+cd client
+
 # install dependencies
 npm install
-
-# serve with hot reload at localhost:8080
-npm run dev
-
-# build for production with minification
-npm run build
-
-# build for production and view the bundle analyzer report
-npm run build --report
-
-# run unit tests
-npm run unit
-
-# run all tests
-npm test
 ```
 
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+**Server**
+``` bash
+cd server
+
+# install dependencies
+npm install
+```
+
+## Start
+
+**Client**
+```bash
+# serve with hot reload at localhost:8080
+cd client
+npm run dev
+```
+
+**Server**
+```bash
+# serve with hot reload at localhost:8081
+cd server
+node ./node_modules/nodemon/bin/nodemon.js src/app.js
+```

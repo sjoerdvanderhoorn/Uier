@@ -1,7 +1,11 @@
 <template>
   <div>
+    <div v-if="loading" class="loading">Loading...</div>
+
+    <div v-if="error" class="error">Error: {{ error }}</div>
+
     <div class="jumbotron">
-      <h1 class="display-4">{{$route.params.id}} {{name}}</h1>
+      <h1 class="display-4">{{name}}</h1>
       <p class="lead">{{purpose}}</p>
       <hr class="my-4">
       <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ex velit, tempus id condimentum sed, pellentesque id orci.</p>
@@ -169,6 +173,9 @@ export default {
   name: "Test",
   data() {
     return {
+      // Data loading
+      // loading: false,
+      // error: null,
       // TestUI system
       activeStep: -1,
       commands: {
@@ -333,7 +340,37 @@ export default {
       ]
     };
   },
+  created() {
+    // fetch the data when the view is created and the data is
+    // already being observed
+    this.fetchData();
+  },
+  watch: {
+    // call again the method if the route changes
+    $route: "fetchData"
+  },
   methods: {
+    fetchData() {
+      var parent = this;
+      this.error = null;
+      this.loading = true;
+      fetch("http://localhost:8081/test/" + this.$route.params.id)
+        .then(function(response) {
+          parent.loading = false;
+          return response.json();
+        })
+        .then(function(myjson) {
+          // Load data
+          parent.name = myjson.name;
+          parent.purpose = myjson.purpose;
+          parent.url = myjson.url;
+          parent.steps = myjson.steps;
+        })
+        .catch(function(error) {
+          parent.loading = false;
+          parent.error = error.toString();
+        });
+    },
     stepDepth: function(stepNumber) {
       var depth = 0;
       this.steps.slice(0, stepNumber + 1).forEach(function(step, i, tempSteps) {
