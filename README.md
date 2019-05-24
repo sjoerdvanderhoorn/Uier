@@ -29,13 +29,11 @@ npm install
 **Client**
 ```bash
 # serve with hot reload at localhost:8080
-cd client
-npm run dev
+run-client.cmd
 ```
 
 **Server**
 ```bash
 # serve with hot reload at localhost:8081
-cd server
-node ./node_modules/nodemon/bin/nodemon.js src/app.js
+run-server.cmd
 ```

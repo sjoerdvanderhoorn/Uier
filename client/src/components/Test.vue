@@ -8,143 +8,184 @@
       <h1 class="display-4">{{name}}</h1>
       <p class="lead">{{purpose}}</p>
       <hr class="my-4">
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ex velit, tempus id condimentum sed, pellentesque id orci.</p>
+      <p>Start URL: {{url}}</p>
       <a class="btn btn-primary btn-lg" href="#" role="button">Run test</a>
+      <button class="btn btn-secondary btn-lg" v-on:click="saveData()">Save Changes</button>
+      <!-- Button trigger modal -->
+      <button
+        type="button"
+        class="btn btn-secondary btn-lg"
+        data-toggle="modal"
+        data-target="#editDetails"
+      >Edit Details</button>
     </div>
 
-    <!-- Test Settings -->
-    <div class="form-group">
-      <div class="input-group mb-3">
-        <div class="input-group-prepend">
-          <span class="input-group-text" style="width: 8em;">Name</span>
+    <!-- Edit Test Details -->
+    <div
+      class="modal fade"
+      id="editDetails"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="editDetailsLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editDetailsLabel">Test Details</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" style="width: 8em;">Name</span>
+                </div>
+                <input type="text" class="form-control" v-model="name">
+              </div>
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" style="width: 8em;">Purpose of test</span>
+                </div>
+                <textarea class="form-control" v-model="purpose"></textarea>
+              </div>
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" style="width: 8em;">Start URL</span>
+                </div>
+                <input type="text" class="form-control" v-model="url">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+          </div>
         </div>
-        <input type="text" class="form-control" v-model="name">
-      </div>
-      <div class="input-group mb-3">
-        <div class="input-group-prepend">
-          <span class="input-group-text" style="width: 8em;">Purpose of test</span>
-        </div>
-        <textarea class="form-control" v-model="purpose"></textarea>
-      </div>
-      <div class="input-group mb-3">
-        <div class="input-group-prepend">
-          <span class="input-group-text" style="width: 8em;">Start URL</span>
-        </div>
-        <input type="text" class="form-control" v-model="url">
       </div>
     </div>
 
     <div class="row">
       <!-- Steps -->
-      <ul class="list-group col-sm-8">
-        <template v-for="(step, stepNumber) in steps">
-          <li
-            class="list-group-item testui-step"
-            v-bind:key="stepNumber+'_list'"
-            v-bind:class="{ active: stepNumber==activeStep }"
-            v-on:click="(activeStep!=stepNumber?activeStep=stepNumber:activeStep=-1)"
-          >
-            <span class="text-muted testui-stepnumber">#{{stepNumber}}</span>
-            <!-- Indention -->
-            <div
-              class="testui-indention"
-              v-for="depth in stepDepth(stepNumber)"
-              v-bind:key="depth"
-            >&nbsp;</div>
-            <!-- Details -->
-            <span>{{step.name}}</span>
-            <span class="badge badge-warning" v-if="tests[0].step==stepNumber">{{tests[0].error}}</span>
-            <span class="text-muted testui-command">{{step.command.toLowerCase()}}</span>
-          </li>
-          <li
-            class="list-group-item"
-            v-bind:key="stepNumber+'_detail'"
-            style="background-color: #f3f7fb;"
-            v-if="stepNumber==activeStep"
-          >
-            <div class="container">
-              <div class="row">
-                <!-- Name -->
-                <div class="input-group mb-3">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text" style="width: 8em;">Name</span>
+      <div class="col-sm-8">
+        <ul class="list-group">
+          <template v-for="(step, stepNumber) in steps">
+            <li
+              class="list-group-item testui-step"
+              v-bind:key="stepNumber+'_list'"
+              v-bind:class="{ active: stepNumber==activeStep }"
+              v-on:click="(activeStep!=stepNumber?activeStep=stepNumber:activeStep=-1)"
+            >
+              <span class="text-muted testui-stepnumber">#{{stepNumber}}</span>
+              <!-- Indention -->
+              <div
+                class="testui-indention"
+                v-for="depth in stepDepth(stepNumber)"
+                v-bind:key="depth"
+              >&nbsp;</div>
+              <span class="text-muted testui-command">{{step.command.toLowerCase()}}</span>
+              <!-- Details -->
+              <span>{{step.name}}</span>
+              <span class="badge badge-warning" v-if="tests[0].step==stepNumber">{{tests[0].error}}</span>
+            </li>
+            <li
+              class="list-group-item"
+              v-bind:key="stepNumber+'_detail'"
+              style="background-color: #f3f7fb;"
+              v-if="stepNumber==activeStep"
+            >
+              <div class="container">
+                <div class="row">
+                  <!-- Name -->
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" style="width: 8em;">Name</span>
+                    </div>
+                    <input type="text" class="form-control" v-model="step.name">
                   </div>
-                  <input type="text" class="form-control" v-model="step.name">
-                </div>
 
-                <!-- Command -->
-                <div class="input-group mb-3">
-                  <div class="input-group-prepend">
-                    <button
-                      class="btn btn-secondary dropdown-toggle"
-                      type="button"
-                      data-toggle="dropdown"
-                      aria-haspopup="true"
-                      aria-expanded="false"
-                      style="width: 8em;"
-                    >{{commands[step.command].name}}</button>
-                    <div class="dropdown-menu" style="max-height: 300px; overflow-y: scroll;">
-                      <a class="dropdown-item" href="#">Javascript</a>
-                      <div role="separator" class="dropdown-divider"></div>
-                      <a
-                        class="dropdown-item"
-                        v-for="(command, commandname) in commands"
-                        v-bind:key="commandname"
-                        v-on:click="step.command=commandname"
-                      >{{command.name}}</a>
+                  <!-- Command -->
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <button
+                        class="btn btn-secondary dropdown-toggle"
+                        type="button"
+                        data-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                        style="width: 8em;"
+                      >{{commands[step.command].name}}</button>
+                      <div class="dropdown-menu" style="max-height: 300px; overflow-y: scroll;">
+                        <a class="dropdown-item" href="#">Javascript</a>
+                        <div role="separator" class="dropdown-divider"></div>
+                        <a
+                          class="dropdown-item"
+                          v-for="(command, commandname) in commands"
+                          v-bind:key="commandname"
+                          v-on:click="step.command=commandname"
+                        >{{command.name}}</a>
+                      </div>
+                    </div>
+                    <!-- Controls -->
+                    <input
+                      type="text"
+                      class="form-control"
+                      v-model="step.target"
+                      v-if="commands[step.command].fields.includes('target')"
+                      placeholder="Target"
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      v-model="step.value"
+                      v-if="commands[step.command].fields.includes('value')"
+                      placeholder="Value"
+                    >
+                    <textarea
+                      class="form-control"
+                      v-model="step.code"
+                      v-if="commands[step.command].fields.includes('code')"
+                      placeholder="test()"
+                    ></textarea>
+                    <textarea
+                      class="form-control"
+                      v-model="step.expression"
+                      v-if="commands[step.command].fields.includes('expression')"
+                      placeholder="abc=123"
+                    ></textarea>
+                    <!-- Info -->
+                    <div class="input-group-append">
+                      <span class="input-group-text">
+                        <a
+                          href="#"
+                          class="badge badge-pill badge-info"
+                          v-bind:title="commands[step.command].info"
+                        >?</a>
+                      </span>
                     </div>
                   </div>
-                  <!-- Controls -->
-                  <input
-                    type="text"
-                    class="form-control"
-                    v-model="step.target"
-                    v-if="commands[step.command].fields.includes('target')"
-                    placeholder="Target"
-                  >
-                  <input
-                    type="text"
-                    class="form-control"
-                    v-model="step.value"
-                    v-if="commands[step.command].fields.includes('value')"
-                    placeholder="Value"
-                  >
-                  <textarea
-                    class="form-control"
-                    v-model="step.code"
-                    v-if="commands[step.command].fields.includes('code')"
-                    placeholder="test()"
-                  ></textarea>
-                  <textarea
-                    class="form-control"
-                    v-model="step.expression"
-                    v-if="commands[step.command].fields.includes('expression')"
-                    placeholder="abc=123"
-                  ></textarea>
-                  <!-- Info -->
-                  <div class="input-group-append">
-                    <span class="input-group-text">
-                      <a
-                        href="#"
-                        class="badge badge-pill badge-info"
-                        v-bind:title="commands[step.command].info"
-                      >?</a>
-                    </span>
-                  </div>
-                </div>
 
-                <!-- Debug -->
-                <div class="input-group mb-3">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text" style="width: 8em;">Debug</span>
+                  <!-- Debug -->
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" style="width: 8em;">Debug</span>
+                    </div>
+                    <textarea class="form-control">GENERATED CODE</textarea>
                   </div>
-                  <textarea class="form-control">GENERATED CODE</textarea>
                 </div>
               </div>
-            </div>
-          </li>
-        </template>
-      </ul>
+            </li>
+          </template>
+        </ul>
+        <div class="mb-3">
+          <button
+            class="btn btn-light float-right"
+            v-on:click="steps.push({name:'',command:'click'})"
+          >+ Add Step</button>
+        </div>
+      </div>
 
       <!-- Output/Actions -->
       <div class="col-sm-4">
@@ -370,6 +411,23 @@ export default {
           parent.loading = false;
           parent.error = error.toString();
         });
+    },
+    saveData() {
+      // console.log(this.name, this.purpose, this.steps, this.url);
+      var data = {
+        name: this.name,
+        purpose: this.purpose,
+        url: this.url,
+        steps: this.steps
+      };
+      fetch("http://localhost:8081/tests/" + this.$route.params.id, {
+        credentials: "same-origin", // 'include', default: 'omit'
+        method: "PUT", // 'GET', 'PUT', 'DELETE', etc.
+        body: JSON.stringify(data), // Coordinate the body type with 'Content-Type'
+        headers: new Headers({
+          "Content-Type": "application/json"
+        })
+      });
     },
     stepDepth: function(stepNumber) {
       var depth = 0;
