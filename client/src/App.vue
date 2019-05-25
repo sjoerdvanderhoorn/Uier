@@ -1,12 +1,6 @@
 <template>
   <div id="app">
-    <!-- Custom styles for this template -->
-    <link
-      href="https://getbootstrap.com/docs/4.1/examples/dashboard/dashboard.css"
-      rel="stylesheet"
-    >
-
-    <!-- https://getbootstrap.com/docs/4.1/examples/dashboard/# -->
+    <link href="static/css/dashboard.css" rel="stylesheet">
 
     <!-- Navbar -->
     <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
@@ -110,7 +104,7 @@
                 This week
               </button>
             </div>
-          </div> -->
+          </div>-->
 
           <router-view/>
         </main>
@@ -120,8 +114,7 @@
 </template>
 
 <script>
-
-import feather from 'feather-icons'
+import feather from "feather-icons";
 
 export default {
   name: "App",
