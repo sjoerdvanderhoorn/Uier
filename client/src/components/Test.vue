@@ -79,8 +79,8 @@
                 v-bind:class="{ 'table-active': stepNumber==activeStep }"
                 v-on:click="(activeStep!=stepNumber?activeStep=stepNumber:activeStep=-1)"
               >
-                <td class="text-muted text-right">#{{stepNumber}}</td>
-                <td nowrap>
+                <td width="50" class="text-muted text-right">#{{stepNumber}}</td>
+                <td style="min-width: 10px;" nowrap>
                   <div
                     class="testui-indention"
                     v-for="depth in stepDepth(stepNumber)"
@@ -88,20 +88,32 @@
                   >&nbsp;</div>
                 </td>
                 <td>
-                  {{step.name}}
-                  <br>
                   <span
-                    class="text-muted"
-                  >{{commands[step.command].friendly.replace("{target}", step.target).replace("{value}", "\"" + step.value + "\"").replace("{expression}", step.expression)}}</span>
-                </td>
-                <td>
-                  <span
-                    class="badge badge-warning"
+                    class="badge badge-warning float-right"
                     v-if="tests[0].step==stepNumber"
                   >{{tests[0].error}}</span>
+                  {{step.name}}
+                  <br>
+                  <span class="text-muted">{{commandDescription(stepNumber)}}</span>
+                </td>
+                <td width="100" nowrap>
+                  <button
+                    class="btn btn-info"
+                    v-bind:class="{'btn-info': movingRow==null || movingRow==stepNumber, 'btn-warning': movingRow!=null && movingRow!=stepNumber}"
+                    :title="movingRow==null ? 'Move' : 'Move to this position'"
+                    v-on:click="moveStep(stepNumber)"
+                  >=</button>
+                  <button
+                    class="btn btn-danger"
+                    title="Remove"
+                    v-on:click="removeStep(stepNumber)"
+                  >x</button>
                 </td>
               </tr>
-              <tr v-bind:key="stepNumber+'_detail'" v-if="stepNumber==activeStep">
+              <tr
+                v-bind:key="stepNumber+'_detail'"
+                v-if="stepNumber==activeStep && movingRow==null"
+              >
                 <td colspan="4">
                   <div class="container">
                     <div class="row">
@@ -189,10 +201,7 @@
           </tbody>
         </table>
         <div class="mb-3">
-          <button
-            class="btn btn-light float-right"
-            v-on:click="test.steps.push({name:'',command:'click'})"
-          >+ Add Step</button>
+          <button class="btn btn-light float-right" v-on:click="addStep()">+ Add Step</button>
         </div>
       </div>
 
@@ -225,6 +234,7 @@ export default {
     return {
       // TestUI system
       activeStep: -1,
+      movingRow: null,
       // Last test results
       tests: [
         {
@@ -352,6 +362,34 @@ export default {
           }
         });
       return depth;
+    },
+    commandDescription: function(stepNumber) {
+      var step = this.test.steps[stepNumber];
+      return this.commands[step.command].friendly
+        .replace("{target}", step.target ? step.target : "(...)")
+        .replace("{value}", '"' + (step.value ? step.value : "(...)") + '"')
+        .replace("{expression}", step.expression ? step.expression : "(...)");
+    },
+    addStep: function() {
+      this.test.steps.push({ name: "", command: "click" });
+      this.activeStep = this.test.steps.length - 1;
+    },
+    removeStep: function(stepNumber) {
+      this.test.steps.splice(stepNumber, 1);
+      this.activeStep = -1;
+    },
+    moveStep: function(stepNumber) {
+      if (this.movingRow == null) {
+        this.movingRow = stepNumber;
+      } else {
+        // alert("Move " + $scope.movingRow + " to " + index);
+        this.test.steps.splice(
+          stepNumber,
+          0,
+          this.test.steps.splice(this.movingRow, 1)[0]
+        );
+        this.movingRow = null;
+      }
     }
   }
 };
