@@ -13,16 +13,16 @@
         <!-- Button trigger modal -->
         <button
           type="button"
-          class="btn btn-primary btn-lg"
+          class="btn btn-primary"
           data-toggle="modal"
           data-target="#addTest"
         >Add Test</button>
-        <a class="btn btn-secondary btn-lg" href="#" role="button">Run all tests</a>
+        <button class="btn btn-secondary">Run all tests</button>
       </div>
 
       <ul class="list-group">
         <li
-          v-for="test in tests.tests"
+          v-for="test in tests"
           v-bind:key="test._id"
           class="list-group-item d-flex justify-content-between align-items-center"
         >
@@ -115,7 +115,7 @@ export default {
       var parent = this;
       this.error = this.tests = null;
       this.loading = true;
-      fetch("http://localhost:8081/tests")
+      fetch("http://localhost:8081/test")
         .then(function(response) {
           parent.loading = false;
           return response.json();
@@ -135,10 +135,10 @@ export default {
         purpose: this.addTestTemplate.purpose,
         url: this.addTestTemplate.url
       };
-      fetch("http://localhost:8081/add_test/", {
-        credentials: "same-origin", // 'include', default: 'omit'
-        method: "POST", // 'GET', 'PUT', 'DELETE', etc.
-        body: JSON.stringify(data), // Coordinate the body type with 'Content-Type'
+      fetch("http://localhost:8081/test", {
+        credentials: "same-origin",
+        method: "POST",
+        body: JSON.stringify(data),
         headers: new Headers({
           "Content-Type": "application/json"
         })

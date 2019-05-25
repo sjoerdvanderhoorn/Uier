@@ -9,12 +9,13 @@
       <p class="lead">{{test.purpose}}</p>
       <hr class="my-4">
       <p>Start URL: {{test.url}}</p>
-      <a class="btn btn-primary btn-lg" href="#" role="button">Run test</a>
-      <button class="btn btn-secondary btn-lg" v-on:click="saveData()">Save Changes</button>
+
+      <button class="btn btn-primary" v-on:click="saveData();">Save Changes</button>
+      <button class="btn btn-secondary">Run test</button>
       <!-- Button trigger modal -->
       <button
         type="button"
-        class="btn btn-secondary btn-lg"
+        class="btn btn-secondary"
         data-toggle="modal"
         data-target="#editDetails"
       >Edit Details</button>
@@ -235,9 +236,9 @@ export default {
       ],
       // User data
       test: {
-        name: '',
-        purpose: '',
-        url: '',
+        name: "",
+        purpose: "",
+        url: "",
         steps: []
       },
       // Commands
@@ -315,36 +316,41 @@ export default {
         });
     },
     saveData() {
+      var parent = this;
       var data = {
         name: this.test.name,
         purpose: this.test.purpose,
         url: this.test.url,
         steps: this.test.steps
       };
-      fetch("http://localhost:8081/tests/" + this.$route.params.id, {
-        credentials: "same-origin", // 'include', default: 'omit'
-        method: "PUT", // 'GET', 'PUT', 'DELETE', etc.
-        body: JSON.stringify(data), // Coordinate the body type with 'Content-Type'
+      fetch("http://localhost:8081/test/" + this.$route.params.id, {
+        credentials: "same-origin",
+        method: "PUT",
+        body: JSON.stringify(data),
         headers: new Headers({
           "Content-Type": "application/json"
         })
+      }).then(function(response) {
+        parent.$router.push("/tests");
       });
     },
     stepDepth: function(stepNumber) {
       var depth = 0;
-      this.test.steps.slice(0, stepNumber + 1).forEach(function(step, i, tempSteps) {
-        tempSteps.push({ command: "bogus" });
-        var lastStep = tempSteps[i - 1];
-        if (i > 0 && lastStep.command == "if") {
-          depth++;
-        } else if (i > 0 && step.command == "else") {
-          depth--;
-        } else if (i > 0 && lastStep.command == "else") {
-          depth++;
-        } else if (i > 0 && step.command == "end") {
-          depth--;
-        }
-      });
+      this.test.steps
+        .slice(0, stepNumber + 1)
+        .forEach(function(step, i, tempSteps) {
+          tempSteps.push({ command: "bogus" });
+          var lastStep = tempSteps[i - 1];
+          if (i > 0 && lastStep.command == "if") {
+            depth++;
+          } else if (i > 0 && step.command == "else") {
+            depth--;
+          } else if (i > 0 && lastStep.command == "else") {
+            depth++;
+          } else if (i > 0 && step.command == "end") {
+            depth--;
+          }
+        });
       return depth;
     }
   }
