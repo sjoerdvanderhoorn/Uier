@@ -5,7 +5,21 @@
     <div v-if="error" class="error">Error: {{ error }}</div>
 
     <div v-if="tests" class="content">
-      <h2>Tests from database</h2>
+      <div class="jumbotron">
+        <h1 class="display-4">Tests</h1>
+        <p class="lead">Overview of all tests in the system with details on their last few runs.</p>
+        <hr class="my-4">
+        <p></p>
+        <!-- Button trigger modal -->
+        <button
+          type="button"
+          class="btn btn-primary btn-lg"
+          data-toggle="modal"
+          data-target="#addTest"
+        >Add Test</button>
+        <a class="btn btn-secondary btn-lg" href="#" role="button">Run all tests</a>
+      </div>
+
       <ul class="list-group">
         <li
           v-for="test in tests.tests"
@@ -17,6 +31,58 @@
         </li>
       </ul>
     </div>
+
+    <!-- Add Test -->
+    <div
+      class="modal fade"
+      id="addTest"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="addTestLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addTestLabel">Add Test</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" style="width: 8em;">Name</span>
+                </div>
+                <input type="text" class="form-control" v-model="addTestTemplate.name">
+              </div>
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" style="width: 8em;">Purpose of test</span>
+                </div>
+                <textarea class="form-control" v-model="addTestTemplate.purpose"></textarea>
+              </div>
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" style="width: 8em;">Start URL</span>
+                </div>
+                <input type="text" class="form-control" v-model="addTestTemplate.url">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              data-dismiss="modal"
+              v-on:click="addTest()"
+            >Create Test</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -27,7 +93,12 @@ export default {
     return {
       loading: false,
       tests: null,
-      error: null
+      error: null,
+      addTestTemplate: {
+        name: "",
+        purpose: "",
+        url: ""
+      }
     };
   },
   created() {
@@ -57,6 +128,21 @@ export default {
           parent.loading = false;
           parent.error = error.toString();
         });
+    },
+    addTest() {
+      var data = {
+        name: this.addTestTemplate.name,
+        purpose: this.addTestTemplate.purpose,
+        url: this.addTestTemplate.url
+      };
+      fetch("http://localhost:8081/add_test/", {
+        credentials: "same-origin", // 'include', default: 'omit'
+        method: "POST", // 'GET', 'PUT', 'DELETE', etc.
+        body: JSON.stringify(data), // Coordinate the body type with 'Content-Type'
+        headers: new Headers({
+          "Content-Type": "application/json"
+        })
+      });
     }
   }
 };

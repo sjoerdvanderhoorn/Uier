@@ -5,10 +5,10 @@
     <div v-if="error" class="error">Error: {{ error }}</div>
 
     <div class="jumbotron">
-      <h1 class="display-4">{{name}}</h1>
-      <p class="lead">{{purpose}}</p>
+      <h1 class="display-4">{{test.name}}</h1>
+      <p class="lead">{{test.purpose}}</p>
       <hr class="my-4">
-      <p>Start URL: {{url}}</p>
+      <p>Start URL: {{test.url}}</p>
       <a class="btn btn-primary btn-lg" href="#" role="button">Run test</a>
       <button class="btn btn-secondary btn-lg" v-on:click="saveData()">Save Changes</button>
       <!-- Button trigger modal -->
@@ -43,19 +43,19 @@
                 <div class="input-group-prepend">
                   <span class="input-group-text" style="width: 8em;">Name</span>
                 </div>
-                <input type="text" class="form-control" v-model="name">
+                <input type="text" class="form-control" v-model="test.name">
               </div>
               <div class="input-group mb-3">
                 <div class="input-group-prepend">
                   <span class="input-group-text" style="width: 8em;">Purpose of test</span>
                 </div>
-                <textarea class="form-control" v-model="purpose"></textarea>
+                <textarea class="form-control" v-model="test.purpose"></textarea>
               </div>
               <div class="input-group mb-3">
                 <div class="input-group-prepend">
                   <span class="input-group-text" style="width: 8em;">Start URL</span>
                 </div>
-                <input type="text" class="form-control" v-model="url">
+                <input type="text" class="form-control" v-model="test.url">
               </div>
             </div>
           </div>
@@ -70,119 +70,127 @@
     <div class="row">
       <!-- Steps -->
       <div class="col-sm-8">
-        <ul class="list-group">
-          <template v-for="(step, stepNumber) in steps">
-            <li
-              class="list-group-item testui-step"
-              v-bind:key="stepNumber+'_list'"
-              v-bind:class="{ active: stepNumber==activeStep }"
-              v-on:click="(activeStep!=stepNumber?activeStep=stepNumber:activeStep=-1)"
-            >
-              <span class="text-muted testui-stepnumber">#{{stepNumber}}</span>
-              <!-- Indention -->
-              <div
-                class="testui-indention"
-                v-for="depth in stepDepth(stepNumber)"
-                v-bind:key="depth"
-              >&nbsp;</div>
-              <span class="text-muted testui-command">{{step.command.toLowerCase()}}</span>
-              <!-- Details -->
-              <span>{{step.name}}</span>
-              <span class="badge badge-warning" v-if="tests[0].step==stepNumber">{{tests[0].error}}</span>
-            </li>
-            <li
-              class="list-group-item"
-              v-bind:key="stepNumber+'_detail'"
-              style="background-color: #f3f7fb;"
-              v-if="stepNumber==activeStep"
-            >
-              <div class="container">
-                <div class="row">
-                  <!-- Name -->
-                  <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text" style="width: 8em;">Name</span>
-                    </div>
-                    <input type="text" class="form-control" v-model="step.name">
-                  </div>
+        <table class="table table-hover">
+          <tbody>
+            <template v-for="(step, stepNumber) in test.steps">
+              <tr
+                v-bind:key="stepNumber+'_list'"
+                v-bind:class="{ 'table-active': stepNumber==activeStep }"
+                v-on:click="(activeStep!=stepNumber?activeStep=stepNumber:activeStep=-1)"
+              >
+                <td class="text-muted text-right">#{{stepNumber}}</td>
+                <td nowrap>
+                  <div
+                    class="testui-indention"
+                    v-for="depth in stepDepth(stepNumber)"
+                    v-bind:key="depth"
+                  >&nbsp;</div>
+                </td>
+                <td>
+                  {{step.name}}
+                  <br>
+                  <span
+                    class="text-muted"
+                  >{{commands[step.command].friendly.replace("{target}", step.target).replace("{value}", "\"" + step.value + "\"").replace("{expression}", step.expression)}}</span>
+                </td>
+                <td>
+                  <span
+                    class="badge badge-warning"
+                    v-if="tests[0].step==stepNumber"
+                  >{{tests[0].error}}</span>
+                </td>
+              </tr>
+              <tr v-bind:key="stepNumber+'_detail'" v-if="stepNumber==activeStep">
+                <td colspan="4">
+                  <div class="container">
+                    <div class="row">
+                      <!-- Name -->
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text" style="width: 8em;">Name</span>
+                        </div>
+                        <input type="text" class="form-control" v-model="step.name">
+                      </div>
 
-                  <!-- Command -->
-                  <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                      <button
-                        class="btn btn-secondary dropdown-toggle"
-                        type="button"
-                        data-toggle="dropdown"
-                        aria-haspopup="true"
-                        aria-expanded="false"
-                        style="width: 8em;"
-                      >{{commands[step.command].name}}</button>
-                      <div class="dropdown-menu" style="max-height: 300px; overflow-y: scroll;">
-                        <a class="dropdown-item" href="#">Javascript</a>
-                        <div role="separator" class="dropdown-divider"></div>
-                        <a
-                          class="dropdown-item"
-                          v-for="(command, commandname) in commands"
-                          v-bind:key="commandname"
-                          v-on:click="step.command=commandname"
-                        >{{command.name}}</a>
+                      <!-- Command -->
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <button
+                            class="btn dropdown-toggle"
+                            type="button"
+                            data-toggle="dropdown"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                            style="width: 8em; background-color: #e9ecef; border-color: #ced4da; color: #495057; text-align: left;"
+                          >{{commands[step.command].name}}</button>
+                          <div class="dropdown-menu" style="max-height: 300px; overflow-y: scroll;">
+                            <a class="dropdown-item" href="#">Javascript</a>
+                            <div role="separator" class="dropdown-divider"></div>
+                            <a
+                              class="dropdown-item"
+                              v-for="(command, commandname) in commands"
+                              v-bind:key="commandname"
+                              v-on:click="step.command=commandname"
+                            >{{command.name}}</a>
+                          </div>
+                        </div>
+                        <!-- Controls -->
+                        <input
+                          type="text"
+                          class="form-control"
+                          v-model="step.target"
+                          v-if="commands[step.command].fields.includes('target')"
+                          placeholder="Target"
+                        >
+                        <input
+                          type="text"
+                          class="form-control"
+                          v-model="step.value"
+                          v-if="commands[step.command].fields.includes('value')"
+                          placeholder="Value"
+                        >
+                        <textarea
+                          class="form-control"
+                          v-model="step.code"
+                          v-if="commands[step.command].fields.includes('code')"
+                          placeholder="test()"
+                        ></textarea>
+                        <textarea
+                          class="form-control"
+                          v-model="step.expression"
+                          v-if="commands[step.command].fields.includes('expression')"
+                          placeholder="abc=123"
+                        ></textarea>
+                        <!-- Info -->
+                        <div class="input-group-append">
+                          <span class="input-group-text">
+                            <a
+                              href="#"
+                              class="badge badge-pill badge-info"
+                              v-bind:title="commands[step.command].info"
+                            >?</a>
+                          </span>
+                        </div>
+                      </div>
+
+                      <!-- Debug -->
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text" style="width: 8em;">Debug</span>
+                        </div>
+                        <textarea class="form-control">GENERATED CODE</textarea>
                       </div>
                     </div>
-                    <!-- Controls -->
-                    <input
-                      type="text"
-                      class="form-control"
-                      v-model="step.target"
-                      v-if="commands[step.command].fields.includes('target')"
-                      placeholder="Target"
-                    >
-                    <input
-                      type="text"
-                      class="form-control"
-                      v-model="step.value"
-                      v-if="commands[step.command].fields.includes('value')"
-                      placeholder="Value"
-                    >
-                    <textarea
-                      class="form-control"
-                      v-model="step.code"
-                      v-if="commands[step.command].fields.includes('code')"
-                      placeholder="test()"
-                    ></textarea>
-                    <textarea
-                      class="form-control"
-                      v-model="step.expression"
-                      v-if="commands[step.command].fields.includes('expression')"
-                      placeholder="abc=123"
-                    ></textarea>
-                    <!-- Info -->
-                    <div class="input-group-append">
-                      <span class="input-group-text">
-                        <a
-                          href="#"
-                          class="badge badge-pill badge-info"
-                          v-bind:title="commands[step.command].info"
-                        >?</a>
-                      </span>
-                    </div>
                   </div>
-
-                  <!-- Debug -->
-                  <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text" style="width: 8em;">Debug</span>
-                    </div>
-                    <textarea class="form-control">GENERATED CODE</textarea>
-                  </div>
-                </div>
-              </div>
-            </li>
-          </template>
-        </ul>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
         <div class="mb-3">
           <button
             class="btn btn-light float-right"
-            v-on:click="steps.push({name:'',command:'click'})"
+            v-on:click="test.steps.push({name:'',command:'click'})"
           >+ Add Step</button>
         </div>
       </div>
@@ -214,45 +222,8 @@ export default {
   name: "Test",
   data() {
     return {
-      // Data loading
-      // loading: false,
-      // error: null,
       // TestUI system
       activeStep: -1,
-      commands: {
-        click: {
-          name: "Click",
-          info:
-            "Use this to execute a mouse click on the element specified by the target.",
-          fields: ["target"]
-        },
-        input: {
-          name: "Input text",
-          info:
-            "Use this to input the value text into a the field specified by the target.",
-          fields: ["target", "value"]
-        },
-        javascript: {
-          name: "Javascript",
-          info: "Specify javascript code to execute against page.",
-          fields: ["code"]
-        },
-        if: {
-          name: "If",
-          info: "",
-          fields: ["expression"]
-        },
-        else: {
-          name: "Else",
-          info: "",
-          fields: []
-        },
-        end: {
-          name: "End",
-          info: "",
-          fields: []
-        }
-      },
       // Last test results
       tests: [
         {
@@ -263,122 +234,53 @@ export default {
         }
       ],
       // User data
-      name: "My First Test",
-      purpose:
-        "Suspendisse porttitor sit amet elit sit amet condimentum. Nulla facilisi. Ut egestas laoreet leo nec fringilla. Phasellus auctor egestas sodales. Quisque sit amet felis aliquet, scelerisque sem luctus, porttitor purus.",
-      url: "https://www.google.com/",
-      steps: [
-        {
-          name: "Step 1 - Click somewhere",
-          command: "click",
-          target: "#somebutton"
+      test: {
+        name: '',
+        purpose: '',
+        url: '',
+        steps: []
+      },
+      // Commands
+      commands: {
+        click: {
+          name: "Click",
+          info:
+            "Use this to execute a mouse click on the element specified by the target.",
+          fields: ["target"],
+          friendly: "click on {target}"
         },
-        {
-          name: "Step 2 - Enter text",
-          command: "input",
-          target: "#sometextbox",
-          value: "some text"
+        input: {
+          name: "Input text",
+          info:
+            "Use this to input the value text into a the field specified by the target.",
+          fields: ["target", "value"],
+          friendly: "input {value} on {target}"
         },
-        {
-          name: "Step 3 - Javascript",
-          command: "javascript",
-          code: "alert(123)"
+        javascript: {
+          name: "Javascript",
+          info: "Specify javascript code to execute against page.",
+          fields: ["code"],
+          friendly: "javascript"
         },
-        {
-          name: "Step 4 - If this=1",
-          command: "if",
-          expression: "element('#sometext')==true"
+        if: {
+          name: "If",
+          info: "",
+          fields: ["expression"],
+          friendly: "if {expression}"
         },
-        {
-          name: "Step 4.1 - Enter text",
-          command: "input",
-          target: "#sometextbox",
-          value: "some text"
+        else: {
+          name: "Else",
+          info: "",
+          fields: [],
+          friendly: "else"
         },
-        {
-          name: "Step 5 - Else",
-          command: "else"
-        },
-        {
-          name: "Step 5.1 - Enter text",
-          command: "input",
-          target: "#sometextbox",
-          value: "some text"
-        },
-        {
-          name: "Step 6 - End",
-          command: "end"
-        },
-        {
-          name: "Step 7 - Enter last text",
-          command: "input",
-          target: "#sometextbox",
-          value: "some text"
-        },
-
-        {
-          name: "IF",
-          command: "if",
-          expression: "element('#sometext')==true"
-        },
-        {
-          name: "Step 4.1 - Enter text",
-          command: "input",
-          target: "#sometextbox",
-          value: "some text"
-        },
-        {
-          name: "IF",
-          command: "if",
-          expression: "element('#sometext')==true"
-        },
-        {
-          name: "Step 4.1 - Enter text",
-          command: "input",
-          target: "#sometextbox",
-          value: "some text"
-        },
-        {
-          name: "Step 4.1 - Enter text",
-          command: "input",
-          target: "#sometextbox",
-          value: "some text"
-        },
-        {
-          name: "ELSE",
-          command: "else"
-        },
-        {
-          name: "Step 5.1 - Enter text",
-          command: "input",
-          target: "#sometextbox",
-          value: "some text"
-        },
-        {
-          name: "END",
-          command: "end"
-        },
-        {
-          name: "Step 4.1 - Enter text",
-          command: "input",
-          target: "#sometextbox",
-          value: "some text"
-        },
-        {
-          name: "ELSE",
-          command: "else"
-        },
-        {
-          name: "Step 5.1 - Enter text",
-          command: "input",
-          target: "#sometextbox",
-          value: "some text"
-        },
-        {
-          name: "END",
-          command: "end"
+        end: {
+          name: "End",
+          info: "",
+          fields: [],
+          friendly: "end"
         }
-      ]
+      }
     };
   },
   created() {
@@ -402,10 +304,10 @@ export default {
         })
         .then(function(myjson) {
           // Load data
-          parent.name = myjson.name;
-          parent.purpose = myjson.purpose;
-          parent.url = myjson.url;
-          parent.steps = myjson.steps;
+          parent.test.name = myjson.name;
+          parent.test.purpose = myjson.purpose;
+          parent.test.url = myjson.url;
+          parent.test.steps = myjson.steps;
         })
         .catch(function(error) {
           parent.loading = false;
@@ -413,12 +315,11 @@ export default {
         });
     },
     saveData() {
-      // console.log(this.name, this.purpose, this.steps, this.url);
       var data = {
-        name: this.name,
-        purpose: this.purpose,
-        url: this.url,
-        steps: this.steps
+        name: this.test.name,
+        purpose: this.test.purpose,
+        url: this.test.url,
+        steps: this.test.steps
       };
       fetch("http://localhost:8081/tests/" + this.$route.params.id, {
         credentials: "same-origin", // 'include', default: 'omit'
@@ -431,7 +332,7 @@ export default {
     },
     stepDepth: function(stepNumber) {
       var depth = 0;
-      this.steps.slice(0, stepNumber + 1).forEach(function(step, i, tempSteps) {
+      this.test.steps.slice(0, stepNumber + 1).forEach(function(step, i, tempSteps) {
         tempSteps.push({ command: "bogus" });
         var lastStep = tempSteps[i - 1];
         if (i > 0 && lastStep.command == "if") {
@@ -461,23 +362,17 @@ li.testui-step:not(.active):hover {
   background-color: #f3f7fb;
 }
 
-span.testui-stepnumber {
+.testui-rownumber {
   display: inline-block;
-  width: 2.5em;
-}
-
-span.testui-command {
-  float: right;
-  width: 8em;
-  text-align: right;
+  width: 25px;
 }
 
 /* Step indention */
 .testui-indention {
   width: 10px;
   height: 100%;
-  margin-left: 10px;
-  margin-right: 10px;
+  margin-left: 3px;
+  margin-right: 3px;
   display: inline-block;
 }
 .testui-indention:nth-of-type(odd) {
@@ -488,6 +383,6 @@ span.testui-command {
 }
 #testui-actions {
   position: sticky;
-  top: 10px;
+  top: 60px;
 }
 </style>

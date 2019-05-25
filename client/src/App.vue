@@ -96,7 +96,7 @@
 
         <!-- routes will be rendered here -->
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
-          <div
+          <!-- <div
             class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
           >
             <h1 class="h2">Page name: {{$route.name}}</h1>
@@ -110,7 +110,7 @@
                 This week
               </button>
             </div>
-          </div>
+          </div> -->
 
           <router-view/>
         </main>
@@ -120,18 +120,13 @@
 </template>
 
 <script>
+
+import feather from 'feather-icons'
+
 export default {
   name: "App",
   mounted() {
-    // Shows icons on dashboards
-    const plugin = document.createElement("script");
-    plugin.setAttribute(
-      "src",
-      "https://unpkg.com/feather-icons@4.21.0/dist/feather.min.js"
-    );
-    plugin.async = true;
-    document.head.appendChild(plugin);
-    // eslint-disable-next-line
+    // Show icons
     feather.replace();
   }
 };
