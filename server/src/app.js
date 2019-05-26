@@ -94,7 +94,7 @@ app.get('/run', (req, res) => {
     Run.find({}, '', function(error, data) {
         if (error) { console.error(error); }
         res.send(data);
-    }).sort({ _id: -1 })
+    }).populate('test', 'name').sort({ _id: -1 })
 })
 app.post('/run', (req, res) => {
     var db = req.db;

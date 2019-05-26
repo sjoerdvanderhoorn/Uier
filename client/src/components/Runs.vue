@@ -18,8 +18,16 @@
           v-bind:key="run._id"
           class="list-group-item d-flex justify-content-between align-items-center"
         >
-          <router-link :to="'/run/' + run._id">{{ run._id }}</router-link>
-          <span class="badge badge-primary badge-pill">14</span>
+          <div class="col-2">
+            <router-link :to="'/run/' + run._id">{{ run.created }}</router-link>
+          </div>
+          <div class="col"><router-link :to="'/test/' + run.test._id">{{ run.test.name }}</router-link></div>
+          <div class="col">{{run.start}}</div>
+          <div class="col">{{run.end}}</div>
+          <div class="col">{{run.steps.length}} steps</div>
+          <div class="col-2">
+            <span class="badge badge-primary badge-pill">{{run.status}}</span>
+          </div>
         </li>
       </ul>
     </div>

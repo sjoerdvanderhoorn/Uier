@@ -11,7 +11,7 @@
       <p>Start URL: {{test.url}}</p>
 
       <button class="btn btn-primary" v-on:click="saveData();">Save Changes</button>
-      <button class="btn btn-secondary">Run test</button>
+      <button class="btn btn-secondary" v-on:click="runTest();">Run test</button>
       <!-- Button trigger modal -->
       <button
         type="button"
@@ -342,6 +342,23 @@ export default {
         })
       }).then(function(response) {
         parent.$router.push("/tests");
+      });
+    },
+    runTest() {
+      var parent = this;
+      var data = {
+        test: this.$route.params.id,
+        status: "new"
+      };
+      fetch("http://localhost:8081/run", {
+        credentials: "same-origin",
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: new Headers({
+          "Content-Type": "application/json"
+        })
+      }).then(function(response) {
+        parent.$router.push("/runs");
       });
     },
     stepDepth: function(stepNumber) {
