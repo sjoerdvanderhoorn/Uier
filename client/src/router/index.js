@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Dashboard from '@/components/Dashboard'
 import Tests from '@/components/Tests'
 import Test from '@/components/Test'
+import Runs from '@/components/Runs'
 
 Vue.use(Router)
 
@@ -22,6 +23,11 @@ export default new Router({
             path: '/test/:id',
             name: 'Test',
             component: Test
+        },
+        {
+            path: '/runs',
+            name: 'Runs',
+            component: Runs
         }
     ]
 })

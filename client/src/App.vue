@@ -31,7 +31,12 @@
               </li>
               <li class="nav-item">
                 <router-link to="/tests" class="nav-link" active-class="active">
-                  <span data-feather="home"></span> Tests
+                  <span data-feather="box"></span> Tests
+                </router-link>
+              </li>
+              <li class="nav-item">
+                <router-link to="/runs" class="nav-link" active-class="active">
+                  <span data-feather="git-commit"></span> Runs
                 </router-link>
               </li>
               <li class="nav-item">
