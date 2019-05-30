@@ -1,48 +1,51 @@
-var webdriver = require('selenium-webdriver');
-const chrome = require('selenium-webdriver/chrome');
-const firefox = require('selenium-webdriver/firefox');
+const fetch = require('node-fetch');
+const runner = require("./src/runner.js");
 
-// Settings
-let firefoxOptions = new firefox.Options();
-firefoxOptions.windowSize({width: 300, height: 400});
-let chromeOptions = new chrome.Options();
-chromeOptions.windowSize({width: 800, height: 600});
+var loop = {
+    newRun: async function(run) {
+        console.log("Running", run._id);
+        // Set status to "running"
+        run.status = "running";
+        fetch("http://localhost:8081/run/" + run._id, {
+            body: JSON.stringify(run),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+        // Run test
+        var result = await runner.run(run.test);
+        // Process and save results
+        run.status = "complete";
+        run.steps = result;
+        fetch("http://localhost:8081/run/" + run._id, {
+            method: "PUT",
+            body: JSON.stringify(run),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+    },
+    checkNewRun: function() {
+        fetch("http://localhost:8081/run_first")
+            .then(function(response) {
+                return response.text();
+            })
+            .then(async function(run) {
+                // Process runs
+                if (run.length > 0) {
+                    // Execute
+                    await loop.newRun(JSON.parse(run));
+                }
+                // Wait for next run
+                loop.checkNewRunTimeout();
+            })
+            .catch(function(error) {
+                console.log(error.toString());
+            });
+    },
+    checkNewRunTimeout: function() {
+        setTimeout(function() { loop.checkNewRun(); }, 5000);
+    }
+}
 
-// Load webdriver
-var driver = new webdriver.Builder()
-    .setFirefoxOptions(firefoxOptions)
-    .setChromeOptions(chromeOptions)
-    .withCapabilities({
-        'browserstack.local' : 'true',
-        'browserstack.localIdentifier' : 'Test123'
-    })
-    .forBrowser('chrome')
-    .build();
-
-// Start test
-driver.get('https://www.google.com/').then(function()
-{
-    // Enter a search query
-    driver.findElement(webdriver.By.name('q')).sendKeys('selenium');
-}).then(function(){ 
-    // Click the Search button
-    driver.findElement(webdriver.By.name("btnK")).click();
-}).then(async function ()
-{
-    // Wait for page to update
-    // https://seleniumhq.github.io/selenium/docs/api/javascript/module/selenium-webdriver/lib/until.html
-    await driver.wait(webdriver.until.elementLocated(webdriver.By.id('bcenter')), 10000, 'Could not locate the child element within the time specified');
-}).then(function()
-{
-    // Get the title
-    return driver.getTitle();
-}).then(function(title)
-{
-    // Display the title
-    console.log(title);
-}).then(function(){ 
-    // Done
-    driver.quit();
-}).catch(function(error){
-    console.log("error", error);
-});
+loop.checkNewRun();

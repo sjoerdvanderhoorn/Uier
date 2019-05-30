@@ -3,3 +3,18 @@
 [0529/163121.072:ERROR:process_reader_win.cc(151)] SuspendThread: Access is denied. (0x5)
 [0529/163121.072:ERROR:process_reader_win.cc(123)] NtOpenThread: {Access Denied} A process has requested access to an object, but has not been granted those access rights. (0xc0000022)
 [0529/163121.073:ERROR:exception_snapshot_win.cc(98)] thread ID 20680 not found in process
+[0530/170610.754:ERROR:process_reader_win.cc(151)] SuspendThread: Toegang geweigerd. (0x5)
+[0530/170610.755:ERROR:process_reader_win.cc(151)] SuspendThread: Toegang geweigerd. (0x5)
+[0530/170610.756:ERROR:process_reader_win.cc(151)] SuspendThread: Toegang geweigerd. (0x5)
+[0530/170610.756:ERROR:process_reader_win.cc(151)] SuspendThread: Toegang geweigerd. (0x5)
+[0530/170610.756:ERROR:process_reader_win.cc(123)] NtOpenThread: {Toegang geweigerd} Een proces heeft toegang tot een object aangevraagd, maar heeft deze toegangsrechten niet gekregen. (0xc0000022)
+[0530/170610.766:ERROR:exception_snapshot_win.cc(98)] thread ID 15944 not found in process
+[0530/170611.181:ERROR:process_reader_win.cc(151)] SuspendThread: Toegang geweigerd. (0x5)
+[0530/170611.182:ERROR:process_reader_win.cc(151)] SuspendThread: Toegang geweigerd. (0x5)
+[0530/170611.182:ERROR:process_reader_win.cc(151)] SuspendThread: Toegang geweigerd. (0x5)
+[0530/170611.182:ERROR:process_reader_win.cc(123)] NtOpenThread: {Toegang geweigerd} Een proces heeft toegang tot een object aangevraagd, maar heeft deze toegangsrechten niet gekregen. (0xc0000022)
+[0530/170611.182:ERROR:exception_snapshot_win.cc(98)] thread ID 16604 not found in process
+[0530/174339.978:ERROR:process_reader_win.cc(123)] NtOpenThread: {Toegang geweigerd} Een proces heeft toegang tot een object aangevraagd, maar heeft deze toegangsrechten niet gekregen. (0xc0000022)
+[0530/174339.979:ERROR:exception_snapshot_win.cc(98)] thread ID 16596 not found in process
+[0530/174532.629:ERROR:exception_handler_server.cc(527)] ConnectNamedPipe: De pipes wordt gesloten. (0xE8)
+[0530/174532.646:ERROR:exception_handler_server.cc(527)] ConnectNamedPipe: De pipes wordt gesloten. (0xE8)

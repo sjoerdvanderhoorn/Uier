@@ -3,10 +3,10 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const morgan = require('morgan')
 
-const app = express()
-app.use(morgan('combined'))
-app.use(bodyParser.json())
-app.use(cors())
+const app = express();
+app.use(morgan('combined'));
+app.use(bodyParser.json({ limit: "10mb", extended: true })); // Extend to avoid "PayloadTooLargeError" and ensure screenshots can be saved
+app.use(cors());
 
 const mongodb_conn_module = require('./mongodbConnModule');
 var db = mongodb_conn_module.connect();
@@ -127,6 +127,7 @@ app.put('/run/:id', (req, res) => {
             record.purpose = req.body.purpose;
             record.url = req.body.url;
             record.steps = req.body.steps;
+            record.status = req.body.status;
             record.updated = new Date()
             record.save(function(error) {
                 if (error) {
@@ -157,6 +158,12 @@ app.get('/run/:id', (req, res) => {
         if (error) { console.error(error); }
         res.send(run)
     })
+})
+app.get('/run_first', (req, res) => {
+    Run.findOne({ status: "new" }, '', function(error, data) {
+        if (error) { console.error(error); }
+        res.send(data);
+    }).sort({ created: 1 }).populate('test', '')
 })
 
 

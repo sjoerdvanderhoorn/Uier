@@ -15,6 +15,12 @@ var RunSchema = new Schema({
     start: Date,
     end: Date,
     steps: [{
+        name: String,
+        command: String,
+        target: String,
+        value: String,
+        code: String,
+        expression: String,
         screenshot: String,
         html: String,
         start: Date,

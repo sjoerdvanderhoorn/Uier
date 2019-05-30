@@ -21,12 +21,17 @@
           <div class="col-2">
             <router-link :to="'/run/' + run._id">{{ run.created }}</router-link>
           </div>
-          <div class="col"><router-link :to="'/test/' + run.test._id">{{ run.test.name }}</router-link></div>
+          <div class="col">
+            <router-link :to="'/test/' + run.test._id">{{ run.test.name }}</router-link>
+          </div>
           <div class="col">{{run.start}}</div>
           <div class="col">{{run.end}}</div>
           <div class="col">{{run.steps.length}} steps</div>
           <div class="col-2">
             <span class="badge badge-primary badge-pill">{{run.status}}</span>
+          </div>
+          <div class="col-1 text-right">
+            <button class="btn btn-danger" title="Remove" v-on:click="removeRun(run._id)">x</button>
           </div>
         </li>
       </ul>
@@ -76,6 +81,21 @@ export default {
           parent.loading = false;
           parent.error = error.toString();
         });
+    },
+    removeRun: function(runId) {
+      if (window.confirm("Are you sure you want to remove this run?")) {
+        var parent = this;
+        fetch("http://localhost:8081/run/" + runId, {
+          credentials: "same-origin",
+          method: "DELETE",
+          body: "",
+          headers: new Headers({
+            "Content-Type": "application/json"
+          })
+        }).then(function(response) {
+          parent.fetchData();
+        });
+      }
     }
   }
 };

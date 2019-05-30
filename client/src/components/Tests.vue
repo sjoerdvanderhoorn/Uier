@@ -26,8 +26,15 @@
           v-bind:key="test._id"
           class="list-group-item d-flex justify-content-between align-items-center"
         >
-          <router-link :to="'/test/' + test._id">{{ test.name }}</router-link>
-          <span class="badge badge-primary badge-pill">14</span>
+          <div class="col">
+            <router-link :to="'/test/' + test._id">{{ test.name }}</router-link>
+          </div>
+          <div class="col-2">
+            <span class="badge badge-primary badge-pill">14</span>
+          </div>
+          <div class="col-1 text-right">
+            <button class="btn btn-danger" title="Remove" v-on:click="removeTest(test._id)">x</button>
+          </div>
         </li>
       </ul>
     </div>
@@ -143,6 +150,21 @@ export default {
           "Content-Type": "application/json"
         })
       });
+    },
+    removeTest: function(testId) {
+      if (window.confirm("Are you sure you want to remove this test?")) {
+        var parent = this;
+        fetch("http://localhost:8081/test/" + testId, {
+          credentials: "same-origin",
+          method: "DELETE",
+          body: "",
+          headers: new Headers({
+            "Content-Type": "application/json"
+          })
+        }).then(function(response) {
+          parent.fetchData();
+        });
+      }
     }
   }
 };
