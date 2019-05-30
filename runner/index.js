@@ -7,6 +7,7 @@ var loop = {
         // Set status to "running"
         run.status = "running";
         fetch("http://localhost:8081/run/" + run._id, {
+            method: "PUT",
             body: JSON.stringify(run),
             headers: {
                 "Content-Type": "application/json"
