@@ -90,8 +90,8 @@
                 <td>
                   <span
                     class="badge badge-warning float-right"
-                    v-if="tests[0].step==stepNumber"
-                  >{{tests[0].error}}</span>
+                    v-if="runs[0].step==stepNumber"
+                  >{{runs[0].error}}</span>
                   {{step.name}}
                   <br>
                   <span class="text-muted">{{commandDescription(stepNumber)}}</span>
@@ -137,21 +137,64 @@
                             style="width: 8em; background-color: #e9ecef; border-color: #ced4da; color: #495057; text-align: left;"
                           >{{commands[step.command].name}}</button>
                           <div class="dropdown-menu" style="max-height: 300px; overflow-y: scroll;">
-                            <a class="dropdown-item" href="#">Javascript</a>
+                            <div class="dropdown-header">Command</div>
                             <div role="separator" class="dropdown-divider"></div>
                             <a
                               class="dropdown-item"
                               v-for="(command, commandname) in commands"
                               v-bind:key="commandname"
                               v-on:click="step.command=commandname"
+                              v-bind:class="{active: step.command==commandname}"
                             >{{command.name}}</a>
                           </div>
                         </div>
                         <!-- Controls -->
+                        <div
+                          class="input-group-prepend dropright"
+                          v-if="commands[step.command].fields.includes('target')"
+                        >
+                          <button
+                            type="button"
+                            class="btn dropdown-toggle dropdown-toggle-split"
+                            data-toggle="dropdown"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                            style="background-color: white; border-right: none; border-color: #ced4da; color: #ced4da;"
+                          >{{step.target.type}}&nbsp;</button>
+                          <div class="dropdown-menu">
+                            <a
+                              class="dropdown-item"
+                              v-on:click="step.target.type='css'"
+                            >CSS selector</a>
+                            <div role="separator" class="dropdown-divider"></div>
+                            <a class="dropdown-item" v-on:click="step.target.type='id'">ID tag</a>
+                            <a class="dropdown-item" v-on:click="step.target.type='name'">Name tag</a>
+                            <a
+                              class="dropdown-item"
+                              v-on:click="step.target.type='className'"
+                            >Class Name</a>
+                            <div role="separator" class="dropdown-divider"></div>
+                            <a
+                              class="dropdown-item"
+                              v-on:click="step.target.type='js'"
+                            >Javascript expression</a>
+                            <div role="separator" class="dropdown-divider"></div>
+                            <a
+                              class="dropdown-item"
+                              v-on:click="step.target.type='linkText'"
+                            >Link Text</a>
+                            <a
+                              class="dropdown-item"
+                              v-on:click="step.target.type='partialLinkText'"
+                            >Partial Link Text</a>
+                            <div role="separator" class="dropdown-divider"></div>
+                            <a class="dropdown-item" v-on:click="step.target.type='xpath'">xpath</a>
+                          </div>
+                        </div>
                         <input
                           type="text"
                           class="form-control"
-                          v-model="step.target"
+                          v-model="step.target.query"
                           v-if="commands[step.command].fields.includes('target')"
                           placeholder="Target"
                         >
@@ -230,7 +273,7 @@ export default {
       // Commands
       commands: require("../../../runner/src/commands.js"),
       // Last test results
-      tests: [
+      runs: [
         {
           date: "2019-05-21 12:00:00",
           result: "fail",
@@ -337,12 +380,16 @@ export default {
     commandDescription: function(stepNumber) {
       var step = this.test.steps[stepNumber];
       return this.commands[step.command].friendly
-        .replace("{target}", step.target ? step.target : "(...)")
+        .replace("{target}", step.target ? step.target.query : "(...)")
         .replace("{value}", '"' + (step.value ? step.value : "(...)") + '"')
         .replace("{expression}", step.expression ? step.expression : "(...)");
     },
     addStep: function() {
-      this.test.steps.push({ name: "", command: "click" });
+      this.test.steps.push({
+        name: "",
+        command: "click",
+        target: { query: "", type: "css" }
+      });
       this.activeStep = this.test.steps.length - 1;
     },
     removeStep: function(stepNumber) {
@@ -400,4 +447,5 @@ li.testui-step:not(.active):hover {
   position: sticky;
   top: 60px;
 }
+
 </style>

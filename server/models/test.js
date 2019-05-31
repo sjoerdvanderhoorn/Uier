@@ -10,7 +10,7 @@ var TestSchema = new Schema({
     steps: [{
         name: String,
         command: String,
-        target: String,
+        target: { query: String, type: { type: String, enum: ["css", "id", "name", "className", "js", "linkText", "partialLinkText", "xpath"] } },
         value: String,
         code: String,
         expression: String

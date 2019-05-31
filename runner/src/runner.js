@@ -32,20 +32,18 @@ module.exports = {
                     await driver.get(step.value);
                 }
                 if (step.command == "click") {
-                    await driver.findElement({ css: step.target }).click();
+                    await driver.findElement(getLocator(step.target)).click();
                 }
                 if (step.command == "clickText") {
-                    await driver.findElement({ partialLinkText: step.target }).click();
+                    await driver.findElement(getLocator(step.target)).click();
                 }
                 if (step.command == "input") {
-                    await driver.findElement({ css: step.target }).sendKeys(step.value);
+                    await driver.findElement(getLocator(step.target)).sendKeys(step.value);
                 }
                 if (step.command == "assertTitle") {
                     var title = await driver.getTitle();
-                    if (title.includes(step.value)) {
-                        console.log(true, title);
-                    } else {
-                        console.log(false, title);
+                    if (!title.includes(step.value)) {
+                        throw "Text not found in title:\n" + title;
                     }
                 }
                 // Mark step as passed
@@ -77,6 +75,12 @@ module.exports = {
             // Return results
             results.steps = outputSteps;
             return await results;
+        }
+
+        function getLocator(target) {
+            var element = {};
+            element[target.type] = target.query;
+            return element;
         }
     }
 }

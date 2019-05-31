@@ -92,7 +92,7 @@ app.get('/test/:id', (req, res) => {
 var Run = require("../models/run");
 
 app.get('/run', (req, res) => {
-    Run.find({}, '', function(error, data) {
+    Run.find({}, 'created status start end url test', function(error, data) {
         if (error) { console.error(error); }
         res.send(data);
     }).populate('test', 'name').sort({ _id: -1 })

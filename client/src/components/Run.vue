@@ -125,7 +125,7 @@ export default {
     commandDescription: function(stepNumber) {
       var step = this.run.steps[stepNumber];
       return this.commands[step.command].friendly
-        .replace("{target}", step.target ? step.target : "(...)")
+        .replace("{target}", step.target ? step.target.query : "(...)")
         .replace("{value}", '"' + (step.value ? step.value : "(...)") + '"')
         .replace("{expression}", step.expression ? step.expression : "(...)");
     }
