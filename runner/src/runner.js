@@ -26,8 +26,6 @@ module.exports = {
             var step = test.steps[i];
             // Log
             console.log(i, step.command);
-            // Take screenshot
-            step.screenshot = await driver.takeScreenshot();
             // Process commands
             try {
                 if (step.command == "navigate") {
@@ -50,23 +48,17 @@ module.exports = {
                         console.log(false, title);
                     }
                 }
-                if (step.command == "assertText") {
-                    var title = await driver.getTitle();
-                    if (title.includes(step.value)) {
-                        console.log(true, title);
-                    } else {
-                        console.log(false, title);
-                    }
-                }
                 // Mark step as passed
                 step.passed = true;
             } catch (error) {
                 step.error = error.toString();
             }
-            // Output results
-            outputSteps.push(step);
             // Pause until next step
             await driver.sleep(1000);
+            // Take screenshot
+            step.screenshot = await driver.takeScreenshot();
+            // Output results
+            outputSteps.push(step);
             // If there was an error, exit
             if (step.error) {
                 console.log("ERROR", step.error);

@@ -52,7 +52,7 @@
             alt="..."
           >
           <div class="card-body">
-            <h5 class="card-title">Step #{{activeStep}}</h5>
+            <h5 class="card-title">Step #{{activeStep + 1}}</h5>
             <p class="card-text">{{(run.steps.length > 0 ? run.steps[activeStep].name : '')}}</p>
             <div v-if="run.steps[activeStep].error" class="alert alert-danger" role="alert">{{run.steps[activeStep].error}}</div>
             <a href="#" class="btn btn-primary">Reveal HTML</a>

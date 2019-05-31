@@ -23,6 +23,13 @@ module.exports = {
         fields: ["target", "value"],
         friendly: "input {value} on {target}"
     },
+    assertTitle: {
+        name: "Assert title",
+        info: "Check if the title contains the specific value.",
+        fields: ["value"],
+        friendly: "assert title {value}"
+    }
+    /*
     javascript: {
         name: "Javascript",
         info: "Specify javascript code to execute against page.",
@@ -47,4 +54,5 @@ module.exports = {
         fields: [],
         friendly: "end"
     }
+    */
 }
