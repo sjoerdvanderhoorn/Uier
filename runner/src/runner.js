@@ -61,7 +61,7 @@ module.exports = {
                 // Mark step as passed
                 step.passed = true;
             } catch (error) {
-                step.error = error;
+                step.error = error.toString();
             }
             // Output results
             outputSteps.push(step);
@@ -69,21 +69,22 @@ module.exports = {
             await driver.sleep(1000);
             // If there was an error, exit
             if (step.error) {
-                console.log(ERROR, step.error.toString());
-                return await exit();
+                console.log("ERROR", step.error);
+                return await exit({ status: "fail" });
             }
             // If this was the last step, exit
             if (i + 1 == test.steps.length) {
                 console.log("DONE");
-                return await exit();
+                return await exit({ status: "pass" });
             }
         }
 
-        async function exit() {
+        async function exit(results) {
             // Test done, close
             await driver.quit();
             // Return results
-            return await outputSteps;
+            results.steps = outputSteps;
+            return await results;
         }
     }
 }

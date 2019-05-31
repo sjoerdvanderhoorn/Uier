@@ -24,14 +24,19 @@
         <nav class="col-md-2 d-none d-md-block bg-light sidebar">
           <div class="sidebar-sticky">
             <ul class="nav flex-column">
-              <li class="nav-item">
+              <!-- <li class="nav-item">
                 <router-link to="/" exact class="nav-link" active-class="active">
                   <span data-feather="home"></span> Dashboard
                 </router-link>
-              </li>
+              </li> -->
               <li class="nav-item">
                 <router-link to="/tests" class="nav-link" active-class="active">
                   <span data-feather="box"></span> Tests
+                </router-link>
+              </li>
+              <li class="nav-item">
+                <router-link to="/collections" class="nav-link" active-class="active">
+                  <span data-feather="codesandbox"></span> Collections
                 </router-link>
               </li>
               <li class="nav-item">
@@ -40,11 +45,16 @@
                 </router-link>
               </li>
               <li class="nav-item">
+                <router-link to="/timers/" class="nav-link" active-class="active">
+                  <span data-feather="clock"></span> Timers
+                </router-link>
+              </li>
+              <li class="nav-item">
                 <router-link to="/users/" class="nav-link" active-class="active">
                   <span data-feather="users"></span> Users
                 </router-link>
               </li>
-              <li class="nav-item">
+              <!-- <li class="nav-item">
                 <router-link to="/reports/" class="nav-link" active-class="active">
                   <span data-feather="bar-chart-2"></span> Reports
                 </router-link>
@@ -53,10 +63,10 @@
                 <router-link to="/integrations/" class="nav-link" active-class="active">
                   <span data-feather="layers"></span> Integrations
                 </router-link>
-              </li>
+              </li> -->
             </ul>
 
-            <h6
+            <!-- <h6
               class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted"
             >
               <span>Saved reports</span>
@@ -89,7 +99,7 @@
                   Year-end sale
                 </a>
               </li>
-            </ul>
+            </ul> -->
           </div>
         </nav>
 

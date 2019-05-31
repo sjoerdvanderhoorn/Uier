@@ -1,40 +1,53 @@
 <template>
   <div class="post">
-    <div v-if="loading" class="loading">Loading...</div>
-
-    <div v-if="error" class="error">Error: {{ error }}</div>
-
-    <div v-if="runs" class="content">
+    <div class="content">
       <div class="jumbotron">
         <h1 class="display-4">Runs</h1>
         <p class="lead">Overview of all runs.</p>
-        <hr class="my-4">
-        <p></p>
       </div>
 
-      <ul class="list-group">
-        <li
-          v-for="run in runs"
-          v-bind:key="run._id"
-          class="list-group-item d-flex justify-content-between align-items-center"
-        >
-          <div class="col-2">
-            <router-link :to="'/run/' + run._id">{{ run.created }}</router-link>
-          </div>
-          <div class="col">
-            <router-link :to="'/test/' + run.test._id">{{ run.test.name }}</router-link>
-          </div>
-          <div class="col">{{run.start}}</div>
-          <div class="col">{{run.end}}</div>
-          <div class="col">{{run.steps.length}} steps</div>
-          <div class="col-2">
-            <span class="badge badge-primary badge-pill">{{run.status}}</span>
-          </div>
-          <div class="col-1 text-right">
-            <button class="btn btn-danger" title="Remove" v-on:click="removeRun(run._id)">x</button>
-          </div>
-        </li>
-      </ul>
+      <div v-if="error" class="alert alert-warning">Error: {{ error }}</div>
+
+      <table class="table table-borderless table-striped">
+        <thead>
+          <tr>
+            <th style="width: 200px;">Run</th>
+            <th>Test</th>
+            <th style="width: 150px;">Duration</th>
+            <th style="width: 150px;">Status</th>
+            <th style="width: 150px;">&nbsp;</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template v-for="run in runs">
+            <tr v-bind:key="run._id">
+              <td nowrap>
+                <router-link :to="'/run/' + run._id">{{run.created}}</router-link>
+              </td>
+              <td>
+                <router-link :to="'/test/' + run.test._id">{{ run.test.name }}</router-link>
+              </td>
+              <td>
+                <span
+                  v-if="run.end"
+                >{{((new Date(run.end)).getTime() - (new Date(run.start)).getTime()) / 1000}} seconds</span>
+                <span v-if="!run.end">-</span>
+              </td>
+              <td>
+                <span
+                  class="badge badge-pill"
+                  v-bind:class="{'badge-success':run.status=='pass', 'badge-danger':run.status=='fail', 'badge-primary': run.status!='pass' && run.status != 'fail'}"
+                >{{run.status}}</span>
+              </td>
+              <td>
+                <button class="btn btn-danger" title="Remove" v-on:click="removeRun(run._id)">x</button>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+
+      <div v-if="loading && runs.length == 0" class="alert alert-primary">Loading...</div>
     </div>
   </div>
 </template>
@@ -45,8 +58,9 @@ export default {
   data() {
     return {
       loading: false,
-      runs: null,
+      runs: [],
       error: null,
+      timer: null,
       addTestTemplate: {
         name: "",
         purpose: "",
@@ -55,27 +69,33 @@ export default {
     };
   },
   created() {
-    // fetch the data when the view is created and the data is
-    // already being observed
+    var parent = this;
     this.fetchData();
+    // Update status every 10 seconds
+    this.timer = setInterval(function() {
+      parent.fetchData();
+    }, 2 * 1000);
+  },
+  destroyed() {
+    clearInterval(this.timer);
   },
   watch: {
-    // call again the method if the route changes
     $route: "fetchData"
   },
   methods: {
     fetchData() {
       var parent = this;
-      this.error = this.runs = null;
+      // this.error = this.runs = null;
       this.loading = true;
       fetch("http://localhost:8081/run")
         .then(function(response) {
           parent.loading = false;
+          parent.error = null;
           return response.json();
         })
-        .then(function(myJson) {
+        .then(function(json) {
           // Load data
-          parent.runs = myJson;
+          parent.runs = json;
         })
         .catch(function(error) {
           parent.loading = false;

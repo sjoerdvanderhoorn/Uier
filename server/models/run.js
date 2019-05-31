@@ -9,8 +9,9 @@ var RunSchema = new Schema({
     test: { type: ObjectId, ref: "Test" },
     status: {
         type: String,
-        enum: ["new", "running", "complete"]
+        enum: ["new", "running", "fail", "pass"]
     },
+    url: String,
     created: Date,
     start: Date,
     end: Date,
@@ -24,7 +25,8 @@ var RunSchema = new Schema({
         screenshot: String,
         html: String,
         start: Date,
-        end: Date
+        end: Date,
+        error: String
     }]
 });
 

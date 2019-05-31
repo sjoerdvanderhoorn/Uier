@@ -17,7 +17,7 @@ var db = mongodb_conn_module.connect();
 var Test = require("../models/test");
 
 app.get('/test', (req, res) => {
-    Test.find({}, 'name purpose url created updated', function(error, data) {
+    Test.find({}, 'name purpose url created updated steps.name', function(error, data) {
         if (error) { console.error(error); }
         res.send(data);
     }).sort({ _id: -1 })
@@ -40,7 +40,8 @@ app.post('/test', (req, res) => {
             console.log(error)
         }
         res.send({
-            success: true
+            success: true,
+            _id: record._id
         })
     })
 })
@@ -114,7 +115,8 @@ app.post('/run', (req, res) => {
             console.log(error)
         }
         res.send({
-            success: true
+            success: true,
+            _id: record._id
         })
     })
 })
@@ -128,6 +130,8 @@ app.put('/run/:id', (req, res) => {
             record.url = req.body.url;
             record.steps = req.body.steps;
             record.status = req.body.status;
+            record.start = req.body.start;
+            record.end = req.body.end;
             record.updated = new Date()
             record.save(function(error) {
                 if (error) {
@@ -157,7 +161,7 @@ app.get('/run/:id', (req, res) => {
     Run.findById(req.params.id, function(error, run) {
         if (error) { console.error(error); }
         res.send(run)
-    })
+    }).populate('test', '')
 })
 app.get('/run_first', (req, res) => {
     Run.findOne({ status: "new" }, '', function(error, data) {

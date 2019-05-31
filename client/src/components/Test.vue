@@ -79,7 +79,7 @@
                 v-bind:class="{ 'table-active': stepNumber==activeStep }"
                 v-on:click="(activeStep!=stepNumber?activeStep=stepNumber:activeStep=-1)"
               >
-                <td width="50" class="text-muted text-right">#{{stepNumber}}</td>
+                <td width="50" class="text-muted text-right">#{{stepNumber + 1}}</td>
                 <td style="min-width: 10px;" nowrap>
                   <div
                     class="testui-indention"
@@ -184,14 +184,6 @@
                             >?</a>
                           </span>
                         </div>
-                      </div>
-
-                      <!-- Debug -->
-                      <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                          <span class="input-group-text" style="width: 8em;">Debug</span>
-                        </div>
-                        <textarea class="form-control">GENERATED CODE</textarea>
                       </div>
                     </div>
                   </div>
@@ -309,7 +301,8 @@ export default {
       var parent = this;
       var data = {
         test: this.$route.params.id,
-        status: "new"
+        status: "new",
+        url: this.test.url
       };
       fetch("http://localhost:8081/run", {
         credentials: "same-origin",

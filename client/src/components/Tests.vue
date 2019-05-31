@@ -1,9 +1,5 @@
 <template>
   <div class="post">
-    <div v-if="loading" class="loading">Loading...</div>
-
-    <div v-if="error" class="error">Error: {{ error }}</div>
-
     <div v-if="tests" class="content">
       <div class="jumbotron">
         <h1 class="display-4">Tests</h1>
@@ -20,23 +16,36 @@
         <button class="btn btn-secondary">Run all tests</button>
       </div>
 
-      <ul class="list-group">
-        <li
-          v-for="test in tests"
-          v-bind:key="test._id"
-          class="list-group-item d-flex justify-content-between align-items-center"
-        >
-          <div class="col">
-            <router-link :to="'/test/' + test._id">{{ test.name }}</router-link>
-          </div>
-          <div class="col-2">
-            <span class="badge badge-primary badge-pill">14</span>
-          </div>
-          <div class="col-1 text-right">
-            <button class="btn btn-danger" title="Remove" v-on:click="removeTest(test._id)">x</button>
-          </div>
-        </li>
-      </ul>
+      <div v-if="error" class="alert alert-warning">Error: {{ error }}</div>
+
+      <table class="table table-borderless table-striped">
+        <thead>
+          <tr>
+            <th>Test</th>
+            <th>Purpose of test</th>
+            <th style="width: 150px;">Steps</th>
+            <th style="width: 150px;">Last Status</th>
+            <th style="width: 150px;">&nbsp;</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template v-for="test in tests">
+            <tr v-bind:key="test._id">
+              <td>
+                <router-link :to="'/test/' + test._id">{{ test.name }}</router-link>
+              </td>
+              <td>{{test.purpose}}</td>
+              <td>{{test.steps.length}}</td>
+              <td>pass/fail?</td>
+              <td>
+                <button class="btn btn-danger" title="Remove" v-on:click="removeTest(test._id)">x</button>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+
+      <div v-if="loading" class="alert alert-primary">Loading...</div>
     </div>
 
     <!-- Add Test -->
@@ -127,9 +136,9 @@ export default {
           parent.loading = false;
           return response.json();
         })
-        .then(function(myJson) {
+        .then(function(json) {
           // Load data
-          parent.tests = myJson;
+          parent.tests = json;
         })
         .catch(function(error) {
           parent.loading = false;
@@ -137,6 +146,7 @@ export default {
         });
     },
     addTest() {
+      var parent = this;
       var data = {
         name: this.addTestTemplate.name,
         purpose: this.addTestTemplate.purpose,
@@ -149,7 +159,13 @@ export default {
         headers: new Headers({
           "Content-Type": "application/json"
         })
-      });
+      })
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(json) {
+          parent.$router.push("/test/" + json._id);
+        });
     },
     removeTest: function(testId) {
       if (window.confirm("Are you sure you want to remove this test?")) {
