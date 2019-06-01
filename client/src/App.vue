@@ -4,7 +4,9 @@
 
     <!-- Navbar -->
     <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Uier</a>
+      <router-link to="/" class="navbar-brand col-sm-3 col-md-2 mr-0">
+        Uier
+      </router-link>
       <!-- <input
         class="form-control form-control-dark w-100"
         type="text"
@@ -28,7 +30,7 @@
                 <router-link to="/" exact class="nav-link" active-class="active">
                   <span data-feather="home"></span> Dashboard
                 </router-link>
-              </li> -->
+              </li>-->
               <li class="nav-item">
                 <router-link to="/tests" class="nav-link" active-class="active">
                   <span data-feather="box"></span> Tests
@@ -63,7 +65,7 @@
                 <router-link to="/integrations/" class="nav-link" active-class="active">
                   <span data-feather="layers"></span> Integrations
                 </router-link>
-              </li> -->
+              </li>-->
             </ul>
 
             <!-- <h6
@@ -99,7 +101,7 @@
                   Year-end sale
                 </a>
               </li>
-            </ul> -->
+            </ul>-->
           </div>
         </nav>
 

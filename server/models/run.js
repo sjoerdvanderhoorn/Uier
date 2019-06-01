@@ -5,7 +5,6 @@ var ObjectId = mongoose.Schema.Types.ObjectId;
 var Test = require("../models/test");
 
 var RunSchema = new Schema({
-    //test: ObjectId,
     test: { type: ObjectId, ref: "Test" },
     status: {
         type: String,

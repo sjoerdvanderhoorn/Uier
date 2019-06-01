@@ -1,6 +1,6 @@
 <template>
   <div class="post">
-    <div v-if="tests" class="content">
+    <div class="content">
       <div class="jumbotron">
         <h1 class="display-4">Tests</h1>
         <p class="lead">Overview of all tests in the system with details on their last few runs.</p>
@@ -24,7 +24,7 @@
             <th>Test</th>
             <th>Purpose of test</th>
             <th style="width: 150px;">Steps</th>
-            <th style="width: 150px;">Last Status</th>
+            <th style="width: 150px;">Last Run</th>
             <th style="width: 150px;">&nbsp;</th>
           </tr>
         </thead>

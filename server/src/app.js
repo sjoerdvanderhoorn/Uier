@@ -170,4 +170,72 @@ app.get('/run_first', (req, res) => {
 })
 
 
+
+// --- COLLECTION ---
+
+var Collection = require("../models/collection");
+
+app.get('/collection', (req, res) => {
+    Collection.find({}, 'name description created updated tests.test', function(error, data) {
+        if (error) { console.error(error); }
+        res.send(data);
+    }).sort({ _id: -1 })
+})
+app.post('/collection', (req, res) => {
+    var record = new Collection({
+        name: req.body.name,
+        description: req.body.description,
+        created: new Date()
+    })
+    record.save(function(error) {
+        if (error) {
+            console.log(error)
+        }
+        res.send({
+            success: true,
+            _id: record._id
+        })
+    })
+})
+app.put('/collection/:id', (req, res) => {
+    var db = req.db;
+    Collection.findById(req.params.id, function(error, record) {
+        if (error) { console.error(error); }
+        if (record) {
+            record.name = req.body.name;
+            record.description = req.body.description;
+            record.tests = req.body.tests;
+            record.updated = new Date();
+            record.save(function(error) {
+                if (error) {
+                    console.log(error)
+                }
+                res.send({
+                    success: true
+                })
+            })
+        }
+    })
+})
+app.delete('/collection/:id', (req, res) => {
+    var db = req.db;
+    Collection.remove({
+        _id: req.params.id
+    }, function(err, collection) {
+        if (err)
+            res.send(err)
+        res.send({
+            success: true
+        })
+    })
+})
+app.get('/collection/:id', (req, res) => {
+    var db = req.db;
+    Collection.findById(req.params.id, function(error, collection) {
+        if (error) { console.error(error); }
+        res.send(collection)
+    }).populate('tests.test', '')
+})
+
+
 app.listen(process.env.PORT || 8081);
