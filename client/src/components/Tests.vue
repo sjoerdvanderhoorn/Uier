@@ -81,9 +81,15 @@
               </div>
               <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                  <span class="input-group-text" style="width: 8em;">Start URL</span>
+                  <span class="input-group-text" style="width: 8em;">URL Domain</span>
                 </div>
-                <input type="text" class="form-control" v-model="addTestTemplate.url">
+                <input type="text" class="form-control" placeholder="https://www.mydomain.com/" v-model="addTestTemplate.urlDomain">
+              </div>
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" style="width: 8em;">URL Path</span>
+                </div>
+                <input type="text" class="form-control" placeholder="/folder/index.php" v-model="addTestTemplate.urlPath">
               </div>
             </div>
           </div>
@@ -113,7 +119,8 @@ export default {
       addTestTemplate: {
         name: "",
         purpose: "",
-        url: ""
+        urlDomain: "",
+        urlPath: ""
       }
     };
   },
@@ -150,7 +157,8 @@ export default {
       var data = {
         name: this.addTestTemplate.name,
         purpose: this.addTestTemplate.purpose,
-        url: this.addTestTemplate.url
+        urlDomain: this.addTestTemplate.urlDomain,
+        urlPath: this.addTestTemplate.urlPath
       };
       fetch("http://localhost:8081/test", {
         credentials: "same-origin",

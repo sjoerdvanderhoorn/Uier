@@ -17,22 +17,18 @@ var db = mongodb_conn_module.connect();
 var Test = require("../models/test");
 
 app.get('/test', (req, res) => {
-    Test.find({}, 'name purpose url created updated steps.name', function(error, data) {
+    Test.find({}, 'name purpose urlDomain urlPath created updated steps.name', function(error, data) {
         if (error) { console.error(error); }
         res.send(data);
     }).sort({ _id: -1 })
 })
 app.post('/test', (req, res) => {
-    var db = req.db;
-    var name = req.body.name;
-    var purpose = req.body.purpose;
-    var url = req.body.url;
-    var steps = req.body.steps;
     var record = new Test({
-        name: name,
-        purpose: purpose,
-        url: url,
-        steps: steps,
+        name: req.body.name,
+        purpose: req.body.purpose,
+        urlDomain: req.body.urlDomain,
+        urlPath: req.body.urlPath,
+        steps: req.body.steps,
         created: new Date()
     })
     record.save(function(error) {
@@ -52,7 +48,8 @@ app.put('/test/:id', (req, res) => {
         if (record) {
             record.name = req.body.name;
             record.purpose = req.body.purpose;
-            record.url = req.body.url;
+            record.urlDomain = req.body.urlDomain;
+            record.urlPath = req.body.urlPath;
             record.steps = req.body.steps;
             record.updated = new Date()
             record.save(function(error) {
@@ -99,22 +96,17 @@ app.get('/test/:id', (req, res) => {
 var Run = require("../models/run");
 
 app.get('/run', (req, res) => {
-    Run.find({}, 'created status start end url test', function(error, data) {
+    Run.find({}, 'created status start end urlDomain test', function(error, data) {
         if (error) { console.error(error); }
         res.send(data);
-    }).populate('test', 'name purpose').sort({ _id: -1 })
+    }).populate('test', 'name purpose urlPath').sort({ _id: -1 })
 })
 app.post('/run', (req, res) => {
-    var db = req.db;
-    var test = req.body.test;
-    var status = req.body.status;
-    var url = req.body.url;
-    var steps = req.body.steps;
     var record = new Run({
-        test: test,
-        status: status,
-        url: url,
-        steps: steps,
+        test: req.body.test,
+        status: req.body.status,
+        urlDomain: req.body.urlDomain,
+        steps: req.body.steps,
         created: new Date()
     })
     record.save(function(error) {
@@ -134,7 +126,7 @@ app.put('/run/:id', (req, res) => {
         if (record) {
             record.name = req.body.name;
             record.purpose = req.body.purpose;
-            record.url = req.body.url;
+            record.urlDomain = req.body.urlDomain;
             record.steps = req.body.steps;
             record.status = req.body.status;
             record.start = req.body.start;

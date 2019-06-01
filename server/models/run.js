@@ -11,7 +11,7 @@ var RunSchema = new Schema({
         type: String,
         enum: ["new", "running", "fail", "pass"]
     },
-    url: String,
+    urlDomain: String,
     created: Date,
     start: Date,
     end: Date,

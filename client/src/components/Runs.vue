@@ -13,6 +13,7 @@
           <tr>
             <th style="width: 200px;">Run</th>
             <th>Test</th>
+            <th>URL Domain</th>
             <th style="width: 150px;">Duration</th>
             <th style="width: 150px;">Status</th>
             <th style="width: 150px;">&nbsp;</th>
@@ -27,6 +28,9 @@
               <td>
                 <router-link :to="'/test/' + run.test._id">{{ run.test.name }}</router-link><br/>
                 <span class="text-muted">{{run.test.purpose}}</span>
+              </td>
+              <td>
+                {{run.urlDomain}}
               </td>
               <td>
                 <span
@@ -61,12 +65,7 @@ export default {
       loading: false,
       runs: [],
       error: null,
-      timer: null,
-      addTestTemplate: {
-        name: "",
-        purpose: "",
-        url: ""
-      }
+      timer: null
     };
   },
   created() {

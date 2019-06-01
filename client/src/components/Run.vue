@@ -77,11 +77,12 @@ export default {
         _id: "",
         name: "",
         purpose: "",
-        url: ""
+        urlPath: ""
       },
       run: {
         created: "",
         status: "",
+        urlDomain: "",
         start: "",
         end: "",
         steps: []
@@ -109,10 +110,11 @@ export default {
           parent.test._id = json.test._id;
           parent.test.name = json.test.name;
           parent.test.purpose = json.test.purpose;
-          parent.test.url = json.test.url;
+          parent.test.urlPath = json.test.urlPath;
           // Load run details
           parent.run.created = json.created;
           parent.run.status = json.status;
+          parent.run.urlDomain = json.urlDomain;
           parent.run.start = json.start;
           parent.run.end = json.end;
           parent.run.steps = json.steps;

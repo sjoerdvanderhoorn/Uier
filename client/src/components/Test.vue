@@ -8,7 +8,7 @@
       <h1 class="display-4">{{test.name}}</h1>
       <p class="lead">{{test.purpose}}</p>
       <hr class="my-4">
-      <p>Start URL: {{test.url}}</p>
+      <p>Default URL: <a :href="test.urlDomain + test.urlPath" target="_blank" title="Open Default URL in new browser window.">{{test.urlDomain}}{{test.urlPath}}</a></p>
 
       <button class="btn btn-primary" v-on:click="saveData();">Save Changes</button>
       <button class="btn btn-secondary" v-on:click="runTest();">Run test</button>
@@ -54,9 +54,15 @@
               </div>
               <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                  <span class="input-group-text" style="width: 8em;">Start URL</span>
+                  <span class="input-group-text" style="width: 8em;">URL Domain</span>
                 </div>
-                <input type="text" class="form-control" v-model="test.url">
+                <input type="text" class="form-control" placeholder="https://www.mydomain.com/" v-model="test.urlDomain">
+              </div>
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" style="width: 8em;">URL Path</span>
+                </div>
+                <input type="text" class="form-control" placeholder="/folder/index.php" v-model="test.urlPath">
               </div>
             </div>
           </div>
@@ -285,7 +291,8 @@ export default {
       test: {
         name: "",
         purpose: "",
-        url: "",
+        urlDomain: "",
+        urlPath: "",
         steps: []
       }
     };
@@ -309,12 +316,13 @@ export default {
           parent.loading = false;
           return response.json();
         })
-        .then(function(myjson) {
+        .then(function(json) {
           // Load data
-          parent.test.name = myjson.name;
-          parent.test.purpose = myjson.purpose;
-          parent.test.url = myjson.url;
-          parent.test.steps = myjson.steps;
+          parent.test.name = json.name;
+          parent.test.purpose = json.purpose;
+          parent.test.urlDomain = json.urlDomain;
+          parent.test.urlPath = json.urlPath;
+          parent.test.steps = json.steps;
         })
         .catch(function(error) {
           parent.loading = false;
@@ -326,7 +334,8 @@ export default {
       var data = {
         name: this.test.name,
         purpose: this.test.purpose,
-        url: this.test.url,
+        urlDomain: this.test.urlDomain,
+        urlPath: this.test.urlPath,
         steps: this.test.steps
       };
       fetch("http://localhost:8081/test/" + this.$route.params.id, {
@@ -345,7 +354,7 @@ export default {
       var data = {
         test: this.$route.params.id,
         status: "new",
-        url: this.test.url
+        urlDomain: this.test.urlDomain // Only store URL Domain, URL Path is taken from the test
       };
       fetch("http://localhost:8081/run", {
         credentials: "same-origin",

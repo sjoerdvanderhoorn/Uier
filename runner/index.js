@@ -15,7 +15,7 @@ var loop = {
             }
         });
         // Run test
-        var results = await runner.run(run.test);
+        var results = await runner.run(run);
         // Process and save results
         run.status = results.status;
         run.end = new Date();

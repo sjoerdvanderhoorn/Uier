@@ -5,6 +5,7 @@ import Tests from "@/components/Tests"
 import Test from "@/components/Test"
 import Runs from "@/components/Runs"
 import Run from "@/components/Run"
+import Collections from "@/components/Collections"
 
 Vue.use(Router)
 
@@ -36,6 +37,11 @@ export default new Router({
             path: "/run/:id",
             name: "Run",
             component: Run
+        },
+        {
+            path: "/collections",
+            name: "Collections",
+            component: Collections
         },
         {
             path: "*",

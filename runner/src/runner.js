@@ -9,7 +9,7 @@ let chromeOptions = new chrome.Options();
 chromeOptions.windowSize({ width: 800, height: 600 });
 
 module.exports = {
-    run: async function(test) {
+    run: async function(run) {
         var outputSteps = [];
         // Load webdriver
         var driver = new webdriver.Builder()
@@ -21,9 +21,12 @@ module.exports = {
             })
             .forBrowser('chrome')
             .build();
-        for (var i = 0; i < test.steps.length; i++) {
+        // Navigate to start URL
+        await driver.get(run.urlDomain + run.test.urlPath);
+        // Loop over steps
+        for (var i = 0; i < run.test.steps.length; i++) {
             // Start
-            var step = test.steps[i];
+            var step = run.test.steps[i];
             // Log
             console.log(i, step.command);
             // Process commands
@@ -63,7 +66,7 @@ module.exports = {
                 return await exit({ status: "fail" });
             }
             // If this was the last step, exit
-            if (i + 1 == test.steps.length) {
+            if (i + 1 == run.test.steps.length) {
                 console.log("DONE");
                 return await exit({ status: "pass" });
             }
