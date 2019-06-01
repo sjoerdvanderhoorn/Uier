@@ -25,7 +25,8 @@
                 <router-link :to="'/run/' + run._id">{{run.created}}</router-link>
               </td>
               <td>
-                <router-link :to="'/test/' + run.test._id">{{ run.test.name }}</router-link>
+                <router-link :to="'/test/' + run.test._id">{{ run.test.name }}</router-link><br/>
+                <span class="text-muted">{{run.test.purpose}}</span>
               </td>
               <td>
                 <span

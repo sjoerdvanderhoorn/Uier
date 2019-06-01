@@ -67,16 +67,23 @@ app.put('/test/:id', (req, res) => {
     })
 })
 app.delete('/test/:id', (req, res) => {
-    var db = req.db;
-    Test.remove({
-        _id: req.params.id
+    Run.deleteMany({
+        test: req.params.id
     }, function(err, test) {
-        if (err)
-            res.send(err)
-        res.send({
-            success: true
-        })
-    })
+        if (err) {
+            res.send(err);
+        } else {
+            Test.remove({
+                _id: req.params.id
+            }, function(err, test) {
+                if (err)
+                    res.send(err)
+                res.send({
+                    success: true
+                })
+            })
+        }
+    });
 })
 app.get('/test/:id', (req, res) => {
     var db = req.db;
@@ -95,7 +102,7 @@ app.get('/run', (req, res) => {
     Run.find({}, 'created status start end url test', function(error, data) {
         if (error) { console.error(error); }
         res.send(data);
-    }).populate('test', 'name').sort({ _id: -1 })
+    }).populate('test', 'name purpose').sort({ _id: -1 })
 })
 app.post('/run', (req, res) => {
     var db = req.db;
