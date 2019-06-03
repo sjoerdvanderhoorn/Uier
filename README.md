@@ -1,43 +1,54 @@
 # Uier
 
-Uier (UI[test]er) is a tool that provides codeless or low-code test editing. Uier generates Selenium compatible scripts for visual testing. When running a script, results are fed back to the user interface to visually inspect failures. Each step captures screenshots and the full browser state.
+Uier (UI[test]er) is a tool that provides codeless or low-code User Experience test editing and management. Uier uses Selenium to perform testing or UI automation. When running a script, results are fed back to the user interface to visually inspect failures. Each step captures screenshots and the full browser state.
 
 * https://www.seleniumhq.org/selenium-ide/docs/en/api/commands/
+* https://www.seleniumhq.org/download/
 
-Uier tends to be a free alternative to **applitools**, **endtest**, **Ghost Inspector**, **Screenster** and many others.
+Uier tends to be a free alternative to **Applitools**, **Endtest**, **Ghost Inspector**, **Screenster** and many others.
+
+## Structure
+
+Uier consists out of three individual pilars that communicate with each other through a REST API.
+
+* **client**
+ * HTTP client (port 8080)
+ * User facing.
+* **server**
+ * REST API server (port 8081)
+ * Talks to MongoDB service.
+ * Facilitates communication between client and runner
+* **runner**
+ * Selenium backend. 
+ * Runs scripts defined by client and reports back status.
+ * Needs to run on a Windows environment.
 
 ## Prerequisites
 
-* Install MongoDB as a service and open on port 27017
+* Windows environment (required for Runner browser drivers)
+ * Chrome
+ * Firefox
+* MongoDB as a service (port 27017)
 
 ## Setup
 
-**Client**
-``` bash
-cd client
+Install all npm dependencies by running the below batch file.
 
-# install dependencies
-npm install
-```
-
-**Server**
-``` bash
-cd server
-
-# install dependencies
-npm install
+```bash
+npm-install.cmd
 ```
 
 ## Start
 
-**Client**
+To run all three services at once, start below batch file. Services can also be started individually.
+
 ```bash
-# serve with hot reload at localhost:8080
-run-client.cmd
+run-all.cmd
 ```
 
-**Server**
+Individual start commands:
 ```bash
-# serve with hot reload at localhost:8081
 run-server.cmd
+run-client.cmd
+run-runner.cms
 ```
