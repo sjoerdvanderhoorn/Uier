@@ -4,6 +4,7 @@ var Schema = mongoose.Schema;
 var TestSchema = new Schema({
     name: String,
     purpose: String,
+    browser: String,
     urlDomain: String,
     urlPath: String,
     created: Date,

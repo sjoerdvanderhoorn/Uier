@@ -11,8 +11,8 @@ var CollectionSchema = new Schema({
     updated: Date,
     tests: [{
         test: { type: ObjectId, ref: "Test" },
-        baseUrl: String,
-        browser: String
+        browser: String,
+        baseUrl: String
     }]
 });
 

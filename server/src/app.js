@@ -17,7 +17,7 @@ var db = mongodb_conn_module.connect();
 var Test = require("../models/test");
 
 app.get('/test', (req, res) => {
-    Test.find({}, 'name purpose urlDomain urlPath created updated steps.name', function(error, data) {
+    Test.find({}, 'name purpose browser urlDomain urlPath created updated steps.name', function(error, data) {
         if (error) { console.error(error); }
         res.send(data);
     }).sort({ _id: -1 })
@@ -26,6 +26,7 @@ app.post('/test', (req, res) => {
     var record = new Test({
         name: req.body.name,
         purpose: req.body.purpose,
+        browser: req.body.browser,
         urlDomain: req.body.urlDomain,
         urlPath: req.body.urlPath,
         steps: req.body.steps,
@@ -48,6 +49,7 @@ app.put('/test/:id', (req, res) => {
         if (record) {
             record.name = req.body.name;
             record.purpose = req.body.purpose;
+            record.browser = req.body.browser;
             record.urlDomain = req.body.urlDomain;
             record.urlPath = req.body.urlPath;
             record.steps = req.body.steps;
@@ -96,7 +98,7 @@ app.get('/test/:id', (req, res) => {
 var Run = require("../models/run");
 
 app.get('/run', (req, res) => {
-    Run.find({}, 'created status start end urlDomain test', function(error, data) {
+    Run.find({}, 'created status start end browser urlDomain test', function(error, data) {
         if (error) { console.error(error); }
         res.send(data);
     }).populate('test', 'name purpose urlPath').sort({ _id: -1 })
@@ -105,6 +107,7 @@ app.post('/run', (req, res) => {
     var record = new Run({
         test: req.body.test,
         status: req.body.status,
+        browser: req.body.browser,
         urlDomain: req.body.urlDomain,
         steps: req.body.steps,
         created: new Date()
@@ -126,6 +129,7 @@ app.put('/run/:id', (req, res) => {
         if (record) {
             record.name = req.body.name;
             record.purpose = req.body.purpose;
+            record.browser = req.body.browser;
             record.urlDomain = req.body.urlDomain;
             record.steps = req.body.steps;
             record.status = req.body.status;
@@ -234,7 +238,7 @@ app.get('/collection/:id', (req, res) => {
     Collection.findById(req.params.id, function(error, collection) {
         if (error) { console.error(error); }
         res.send(collection)
-    }).populate('tests.test', '')
+    }) /*.populate('tests.test', '')*/
 })
 
 

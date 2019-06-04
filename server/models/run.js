@@ -10,6 +10,7 @@ var RunSchema = new Schema({
         type: String,
         enum: ["new", "running", "fail", "pass"]
     },
+    browser: String,
     urlDomain: String,
     created: Date,
     start: Date,

@@ -81,6 +81,19 @@
               </div>
               <div class="input-group mb-3">
                 <div class="input-group-prepend">
+                  <span class="input-group-text" style="width: 8em;">Browser</span>
+                </div>
+                <select class="form-control" v-model="addTestTemplate.browser">
+                    <option
+                      v-for="(browser, browsername) in browsers"
+                      v-bind:key="browsername"
+                      v-bind:value="browsername"
+                      v-bind:selected="browsername==addTestTemplate.browser"
+                    >{{browser.name}}</option>
+                  </select>
+              </div>
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
                   <span class="input-group-text" style="width: 8em;">URL Domain</span>
                 </div>
                 <input type="text" class="form-control" placeholder="https://www.mydomain.com/" v-model="addTestTemplate.urlDomain">
@@ -116,9 +129,12 @@ export default {
       loading: false,
       tests: null,
       error: null,
+      // Browsers
+      browsers: require("../../../runner/src/browsers.js"),
       addTestTemplate: {
         name: "",
         purpose: "",
+        browser: "",
         urlDomain: "",
         urlPath: ""
       }
@@ -157,6 +173,7 @@ export default {
       var data = {
         name: this.addTestTemplate.name,
         purpose: this.addTestTemplate.purpose,
+        browser: this.addTestTemplate.browser,
         urlDomain: this.addTestTemplate.urlDomain,
         urlPath: this.addTestTemplate.urlPath
       };

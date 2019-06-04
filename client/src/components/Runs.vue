@@ -13,7 +13,7 @@
           <tr>
             <th style="width: 200px;">Run</th>
             <th>Test</th>
-            <th>URL Domain</th>
+            <th>Environment</th>
             <th style="width: 150px;">Duration</th>
             <th style="width: 150px;">Status</th>
             <th style="width: 150px;">&nbsp;</th>
@@ -30,7 +30,8 @@
                 <span class="text-muted">{{run.test.purpose}}</span>
               </td>
               <td>
-                {{run.urlDomain}}
+                {{browsers[run.browser].name}}<br/>
+                <span class="text-muted">{{run.urlDomain}}</span>
               </td>
               <td>
                 <span
@@ -65,7 +66,9 @@ export default {
       loading: false,
       runs: [],
       error: null,
-      timer: null
+      timer: null,
+      // Browsers
+      browsers: require("../../../runner/src/browsers.js")
     };
   },
   created() {
