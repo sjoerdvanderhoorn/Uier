@@ -1,6 +1,8 @@
 import Vue from "vue"
 import Router from "vue-router"
 import Dashboard from "@/components/Dashboard"
+import About from "@/components/About"
+import Help from "@/components/Help"
 import Tests from "@/components/Tests"
 import Test from "@/components/Test"
 import Runs from "@/components/Runs"
@@ -48,6 +50,16 @@ export default new Router({
             path: "/collection/:id",
             name: "Collection",
             component: Collection
+        },
+        {
+            path: "/about",
+            name: "About",
+            component: About
+        },
+        {
+            path: "/help",
+            name: "Help",
+            component: Help
         },
         {
             path: "*",

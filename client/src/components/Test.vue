@@ -100,7 +100,7 @@
                   >{{runs[0].error}}</span>
                   {{step.name}}
                   <br>
-                  <span class="text-muted">{{commandDescription(stepNumber)}}</span>
+                  <span class="text-muted" v-html="commandDescription(stepNumber)"></span>
                 </td>
                 <td width="100" nowrap>
                   <button
@@ -389,9 +389,9 @@ export default {
     commandDescription: function(stepNumber) {
       var step = this.test.steps[stepNumber];
       return this.commands[step.command].friendly
-        .replace("{target}", step.target ? step.target.query : "(...)")
-        .replace("{value}", '"' + (step.value ? step.value : "(...)") + '"')
-        .replace("{expression}", step.expression ? step.expression : "(...)");
+        .replace("{target}", "<strong>" + (step.target && step.target.query ? step.target.query : "(...)") + "</strong>")
+        .replace("{value}", "<strong>" + (step.value ? step.value : "(...)") + "</strong>")
+        .replace("{expression}", "<strong>" + (step.expression ? step.expression : "(...)") + "</strong>");
     },
     addStep: function() {
       this.test.steps.push({

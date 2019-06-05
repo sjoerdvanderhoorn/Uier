@@ -5,29 +5,29 @@ Uier (UI[test]er) is a tool that provides codeless or low-code User Experience t
 * https://www.seleniumhq.org/selenium-ide/docs/en/api/commands/
 * https://www.seleniumhq.org/download/
 
-Uier tends to be a free alternative to **Applitools**, **Endtest**, **Ghost Inspector**, **Screenster** and many others.
+Uier tends to be a free alternative to **Applitools**, **Endtest**, **Ghost Inspector**, **Usetrace**, **Screenster** and many others.
 
 ## Structure
 
 Uier consists out of three individual pilars that communicate with each other through a REST API.
 
 * **client**
- * HTTP client (port 8080)
- * User facing.
+  * HTTP client (port 8080)
+  * User facing.
 * **server**
- * REST API server (port 8081)
- * Talks to MongoDB service.
- * Facilitates communication between client and runner
+  * REST API server (port 8081)
+  * Talks to MongoDB service.
+  * Facilitates communication between client and runner
 * **runner**
- * Selenium backend. 
- * Runs scripts defined by client and reports back status.
- * Needs to run on a Windows environment.
+  * Selenium backend. 
+  * Runs scripts defined by client and reports back status.
+  * Needs to run on a Windows environment.
 
 ## Prerequisites
 
 * Windows environment (required for Runner browser drivers)
- * Chrome
- * Firefox
+  * Chrome
+  * Firefox
 * MongoDB as a service (port 27017)
 
 ## Setup

@@ -15,5 +15,7 @@ cd runner
 start "uier-runner" /min npm run dev
 cd..
 
-echo All services started, press any key to close this window.
+echo All services started, running UI on http://localhost:8080/
+echo .
+echo Press any key to close this window.
 pause
