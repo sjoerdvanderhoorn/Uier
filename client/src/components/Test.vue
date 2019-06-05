@@ -8,7 +8,8 @@
       <h1 class="display-4">{{test.name}}</h1>
       <p class="lead">{{test.purpose}}</p>
       <hr class="my-4">
-      <p>Default URL: <a :href="test.urlDomain + test.urlPath" target="_blank" title="Open Default URL in new browser window.">{{test.urlDomain}}{{test.urlPath}}</a></p>
+      <p>Browser: {{(browsers[test.browser] ? browsers[test.browser].name : "")}}</p>
+      <p>URL: <a :href="test.urlDomain + test.urlPath" target="_blank" title="Open Default URL in new browser window.">{{test.urlDomain}}{{test.urlPath}}</a></p>
 
       <button class="btn btn-primary" v-on:click="saveData();">Save Changes</button>
       <button class="btn btn-secondary" v-on:click="runTest();">Run test</button>
@@ -51,6 +52,19 @@
                   <span class="input-group-text" style="width: 8em;">Purpose of test</span>
                 </div>
                 <textarea class="form-control" v-model="test.purpose"></textarea>
+              </div>
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" style="width: 8em;">Browser</span>
+                </div>
+                <select class="form-control" v-model="test.browser">
+                    <option
+                      v-for="(browser, browsername) in browsers"
+                      v-bind:key="browsername"
+                      v-bind:value="browsername"
+                      v-bind:selected="browsername==test.browser"
+                    >{{browser.name}}</option>
+                  </select>
               </div>
               <div class="input-group mb-3">
                 <div class="input-group-prepend">
@@ -276,6 +290,8 @@ export default {
       // TestUI system
       activeStep: -1,
       movingRow: null,
+      // Browsers
+      browsers: require("../../../runner/src/browsers.js"),
       // Commands
       commands: require("../../../runner/src/commands.js"),
       // Last test results
@@ -291,6 +307,7 @@ export default {
       test: {
         name: "",
         purpose: "",
+        browser: "",
         urlDomain: "",
         urlPath: "",
         steps: []
@@ -320,6 +337,7 @@ export default {
           // Load data
           parent.test.name = json.name;
           parent.test.purpose = json.purpose;
+          parent.test.browser = json.browser;
           parent.test.urlDomain = json.urlDomain;
           parent.test.urlPath = json.urlPath;
           parent.test.steps = json.steps;
@@ -334,6 +352,7 @@ export default {
       var data = {
         name: this.test.name,
         purpose: this.test.purpose,
+        browser: this.test.browser,
         urlDomain: this.test.urlDomain,
         urlPath: this.test.urlPath,
         steps: this.test.steps
@@ -354,6 +373,7 @@ export default {
       var data = {
         test: this.$route.params.id,
         status: "new",
+        browser: this.test.browser,
         urlDomain: this.test.urlDomain // Only store URL Domain, URL Path is taken from the test
       };
       fetch("http://localhost:8081/run", {

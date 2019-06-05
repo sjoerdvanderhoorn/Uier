@@ -80,18 +80,49 @@
               <tr v-bind:key="testNumber+'_list'">
                 <td width="50" class="text-muted text-right">#{{testNumber + 1}}</td>
                 <td>
-                  <input class="form-control" placeholder="Perform search on Google">
+                  <div class="input-group mb-3">
+                    <select class="form-control" v-model="test.test">
+                      <option
+                        v-for="testDetails in tests"
+                        v-bind:key="testDetails._id"
+                        v-bind:value="testDetails._id"
+                      >{{testDetails.name}}</option>
+                    </select>
+                    <div class="input-group-append">
+                      <button
+                        class="btn btn-outline-secondary"
+                        type="button"
+                        title="Go to test."
+                      >&#10179;</button>
+                      <button
+                        class="btn btn-outline-secondary"
+                        type="button"
+                        title="Use Domain and Browser values from test."
+                        v-on:click="test.urlDomain=tests.find(t=>t._id==test.test).urlDomain; test.browser='firefox';"
+                      >&#128203;</button>
+                    </div>
+                  </div>
                 </td>
                 <td>
-                  <input class="form-control" placeholder="https://www.google.com/">
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="https://..."
+                    v-model="test.urlDomain"
+                  >
                 </td>
                 <td>
-                  <input class="form-control" placeholder="Chrome">
+                  <select class="form-control" v-model="test.browser">
+                    <option
+                      v-for="(browser, browsername) in browsers"
+                      v-bind:key="browsername"
+                      v-bind:value="browsername"
+                      v-bind:selected="browsername==test.browser"
+                    >{{browser.name}}</option>
+                  </select>
                 </td>
                 <td>
-                  <span
-                  class="badge badge-pill badge-danger"
-                >fail</span>
+                  <span class="badge badge-pill badge-danger">fail</span>
                 </td>
                 <td width="100" nowrap>
                   <button
@@ -126,8 +157,8 @@ export default {
       // CollectionUI system
       activeTest: -1,
       movingRow: null,
-      // Commands
-      commands: require("../../../runner/src/commands.js"),
+      // Browsers
+      browsers: require("../../../runner/src/browsers.js"),
       // Last collection results
       runs: [
         {
@@ -137,6 +168,8 @@ export default {
           error: "Error during last run"
         }
       ],
+      // Tests
+      tests: [],
       // User data
       collection: {
         name: "",
@@ -173,6 +206,19 @@ export default {
           parent.collection.urlDomain = json.urlDomain;
           parent.collection.urlPath = json.urlPath;
           parent.collection.tests = json.tests;
+        })
+        .catch(function(error) {
+          parent.loading = false;
+          parent.error = error.toString();
+        });
+      fetch("http://localhost:8081/test/")
+        .then(function(response) {
+          parent.loading = false;
+          return response.json();
+        })
+        .then(function(json) {
+          // Load data
+          parent.tests = json;
         })
         .catch(function(error) {
           parent.loading = false;
@@ -219,37 +265,11 @@ export default {
       });
       */
     },
-    testDepth: function(testNumber) {
-      var depth = 0;
-      this.collection.tests
-        .slice(0, testNumber + 1)
-        .forEach(function(test, i, tempTests) {
-          tempTests.push({ command: "bogus" });
-          var lastTest = tempTests[i - 1];
-          if (i > 0 && lastTest.command == "if") {
-            depth++;
-          } else if (i > 0 && test.command == "else") {
-            depth--;
-          } else if (i > 0 && lastTest.command == "else") {
-            depth++;
-          } else if (i > 0 && test.command == "end") {
-            depth--;
-          }
-        });
-      return depth;
-    },
-    commandDescription: function(testNumber) {
-      var test = this.collection.tests[testNumber];
-      return this.commands[test.command].friendly
-        .replace("{target}", test.target ? test.target.query : "(...)")
-        .replace("{value}", '"' + (test.value ? test.value : "(...)") + '"')
-        .replace("{expression}", test.expression ? test.expression : "(...)");
-    },
     addTest: function() {
       this.collection.tests.push({
-        name: "",
-        command: "click",
-        target: { query: "", type: "css" }
+        test: "",
+        urlDomain: "",
+        browser: ""
       });
       this.activeTest = this.collection.tests.length - 1;
     },

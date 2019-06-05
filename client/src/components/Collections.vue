@@ -112,7 +112,6 @@ export default {
     };
   },
   created() {
-    var parent = this;
     this.fetchData();
   },
   destroyed() {},

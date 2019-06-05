@@ -19,7 +19,7 @@ module.exports = {
                 'browserstack.local': 'true',
                 'browserstack.localIdentifier': 'uierRun'
             })
-            .forBrowser('firefox')
+            .forBrowser(run.browser)
             .build();
         // Navigate to start URL
         await driver.get(run.urlDomain + run.test.urlPath);
