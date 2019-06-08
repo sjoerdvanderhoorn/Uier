@@ -1,6 +1,12 @@
 <template>
-  <div>
-    <h1>Help</h1>
+  <div class="post">
+    <div class="content">
+      <div class="jumbotron">
+        <h1 class="display-4">Help</h1>
+        <p class="lead">Uier help topics</p>
+      </div>
+      <div></div>
+    </div>
   </div>
 </template>
 
