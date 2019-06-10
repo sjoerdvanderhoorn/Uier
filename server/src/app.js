@@ -66,21 +66,32 @@ app.put('/test/:id', (req, res) => {
     })
 })
 app.delete('/test/:id', (req, res) => {
+    // Remove all runs
     Run.deleteMany({
         test: req.params.id
     }, function(err, test) {
         if (err) {
             res.send(err);
         } else {
-            Test.remove({
-                _id: req.params.id
-            }, function(err, test) {
-                if (err)
-                    res.send(err)
-                res.send({
-                    success: true
-                })
+            // Remove from all collections
+            Collection.updateMany({ "tests.test": req.params.id }, { updated: new Date(), $pull: { tests: { test: req.params.id } } }, function(err, test) {
+                if (err) {
+                    res.send(err);
+                } else {
+                    // Remove actual test
+                    Test.remove({
+                        _id: req.params.id
+                    }, function(err, test) {
+                        if (err) {
+                            res.send(err)
+                        }
+                        res.send({
+                            success: true
+                        })
+                    })
+                }
             })
+
         }
     });
 })

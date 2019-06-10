@@ -89,16 +89,14 @@
                       >{{testDetails.name}}</option>
                     </select>
                     <div class="input-group-append">
-                      <button
-                        class="btn btn-outline-secondary"
-                        type="button"
-                        title="Go to test."
-                      >&#10179;</button>
+                      <router-link :to="'/test/' + test.test" tag="button" class="btn btn-outline-secondary" title="Go to Test.">
+                        &#10179;
+                      </router-link>
                       <button
                         class="btn btn-outline-secondary"
                         type="button"
                         title="Use Domain and Browser values from test."
-                        v-on:click="test.urlDomain=tests.find(t=>t._id==test.test).urlDomain; test.browser='firefox';"
+                        v-on:click="test.urlDomain=tests.find(t=>t._id==test.test).urlDomain; test.browser=tests.find(t=>t._id==test.test).browser;"
                       >&#128203;</button>
                     </div>
                   </div>
@@ -174,8 +172,6 @@ export default {
       collection: {
         name: "",
         description: "",
-        urlDomain: "",
-        urlPath: "",
         tests: []
       }
     };
@@ -203,8 +199,6 @@ export default {
           // Load data
           parent.collection.name = json.name;
           parent.collection.description = json.description;
-          parent.collection.urlDomain = json.urlDomain;
-          parent.collection.urlPath = json.urlPath;
           parent.collection.tests = json.tests;
         })
         .catch(function(error) {
@@ -230,8 +224,6 @@ export default {
       var data = {
         name: this.collection.name,
         description: this.collection.description,
-        urlDomain: this.collection.urlDomain,
-        urlPath: this.collection.urlPath,
         tests: this.collection.tests
       };
       fetch("http://localhost:8081/collection/" + this.$route.params.id, {

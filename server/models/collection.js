@@ -12,7 +12,7 @@ var CollectionSchema = new Schema({
     tests: [{
         test: { type: ObjectId, ref: "Test" },
         browser: String,
-        baseUrl: String
+        urlDomain: String
     }]
 });
 
