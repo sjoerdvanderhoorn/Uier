@@ -89,38 +89,60 @@
                       >{{testDetails.name}}</option>
                     </select>
                     <div class="input-group-append">
-                      <router-link :to="'/test/' + test.test" tag="button" class="btn btn-outline-secondary" title="Go to Test.">
-                        &#10179;
-                      </router-link>
+                      <router-link
+                        :to="'/test/' + test.test"
+                        tag="button"
+                        class="btn btn-outline-secondary"
+                        title="Go to Test."
+                      >&#128279;</router-link>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="input-group mb-3">
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="https://..."
+                      v-model="test.urlDomain"
+                    >
+                    <div class="input-group-append">
                       <button
                         class="btn btn-outline-secondary"
                         type="button"
-                        title="Use Domain and Browser values from test."
-                        v-on:click="test.urlDomain=tests.find(t=>t._id==test.test).urlDomain; test.browser=tests.find(t=>t._id==test.test).browser;"
+                        title="Use Domain from test."
+                        v-on:click="test.urlDomain=tests.find(t=>t._id==test.test).urlDomain"
                       >&#128203;</button>
                     </div>
                   </div>
                 </td>
                 <td>
-                  <input
-                    type="text"
-                    class="form-control"
-                    placeholder="https://..."
-                    v-model="test.urlDomain"
-                  >
+                  <div class="input-group mb-3">
+                    <select class="form-control" v-model="test.browser">
+                      <option
+                        v-for="(browser, browsername) in browsers"
+                        v-bind:key="browsername"
+                        v-bind:value="browsername"
+                        v-bind:selected="browsername==test.browser"
+                      >{{browser.name}}</option>
+                    </select>
+                    <div class="input-group-append">
+                      <button
+                        class="btn btn-outline-secondary"
+                        type="button"
+                        title="Use Browser from test."
+                        v-on:click="test.browser=tests.find(t=>t._id==test.test).browser;"
+                      >&#128203;</button>
+                    </div>
+                  </div>
                 </td>
                 <td>
-                  <select class="form-control" v-model="test.browser">
-                    <option
-                      v-for="(browser, browsername) in browsers"
-                      v-bind:key="browsername"
-                      v-bind:value="browsername"
-                      v-bind:selected="browsername==test.browser"
-                    >{{browser.name}}</option>
-                  </select>
-                </td>
-                <td>
-                  <span class="badge badge-pill badge-danger">fail</span>
+                  <router-link :to="'/run/' + test.run" title="Go to Run.">
+                    <span
+                      class="badge badge-pill"
+                      v-bind:class="{'badge-success':test.status=='pass', 'badge-danger':test.status=='fail', 'badge-primary': test.status!='pass' && test.status != 'fail'}"
+                    >{{test.status}}</span>
+                  </router-link>
                 </td>
                 <td width="100" nowrap>
                   <button
@@ -238,24 +260,19 @@ export default {
       });
     },
     runCollection() {
-      /*
       var parent = this;
-      var data = {
-        collection: this.$route.params.id,
-        status: "new",
-        urlDomain: this.collection.urlDomain // Only store URL Domain, URL Path is taken from the collection
-      };
-      fetch("http://localhost:8081/run", {
-        credentials: "same-origin",
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: new Headers({
-          "Content-Type": "application/json"
-        })
-      }).then(function(response) {
+      fetch(
+        "http://localhost:8081/collection/" + this.$route.params.id + "/run",
+        {
+          credentials: "same-origin",
+          method: "POST",
+          headers: new Headers({
+            "Content-Type": "application/json"
+          })
+        }
+      ).then(function(response) {
         parent.$router.push("/runs");
       });
-      */
     },
     addTest: function() {
       this.collection.tests.push({

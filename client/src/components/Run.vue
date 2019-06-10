@@ -7,11 +7,12 @@
     <div class="jumbotron">
       <h1 class="display-4">{{test.name}}</h1>
       <p class="lead">
-        Run: {{run.created}}
+        Run: {{run.created.replace("T", " ").substr(0,19)}}
         <span class="badge badge-pill" v-bind:class="{'badge-success':run.status=='pass', 'badge-danger':run.status=='fail', 'badge-primary': run.status!='pass' && run.status != 'fail'}">{{run.status}}</span>
       </p>
       <hr class="my-4">
       <p>Duration: {{((new Date(run.end)).getTime() - (new Date(run.start)).getTime()) / 1000}} seconds</p>
+      <button class="btn btn-primary" v-on:click="runTest();">Run again</button>
       <router-link :to="'/test/' + test._id" tag="button" class="btn btn-secondary">Go to test</router-link>
     </div>
 
@@ -82,6 +83,7 @@ export default {
       run: {
         created: "",
         status: "",
+        browser: "",
         urlDomain: "",
         start: "",
         end: "",
@@ -114,6 +116,7 @@ export default {
           // Load run details
           parent.run.created = json.created;
           parent.run.status = json.status;
+          parent.run.browser = json.browser;
           parent.run.urlDomain = json.urlDomain;
           parent.run.start = json.start;
           parent.run.end = json.end;
@@ -130,6 +133,23 @@ export default {
         .replace("{target}", "<strong>" + (step.target && step.target.query ? step.target.query : "(...)") + "</strong>")
         .replace("{value}", "<strong>" + (step.value ? step.value : "(...)") + "</strong>")
         .replace("{expression}", "<strong>" + (step.expression ? step.expression : "(...)") + "</strong>");
+    },
+    runTest() {
+      var parent = this;
+      var data = {
+        browser: this.run.browser,
+        urlDomain: this.run.urlDomain
+      }
+      fetch("http://localhost:8081/test/" + this.test._id + "/run", {
+        credentials: "same-origin",
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: new Headers({
+          "Content-Type": "application/json"
+        })
+      }).then(function(response) {
+        parent.$router.push("/runs");
+      });
     }
   }
 };

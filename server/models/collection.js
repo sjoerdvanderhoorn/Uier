@@ -12,7 +12,12 @@ var CollectionSchema = new Schema({
     tests: [{
         test: { type: ObjectId, ref: "Test" },
         browser: String,
-        urlDomain: String
+        urlDomain: String,
+        status: {
+            type: String,
+            enum: ["new", "running", "fail", "pass"]
+        },
+        run: { type: ObjectId, ref: "Run" }
     }]
 });
 

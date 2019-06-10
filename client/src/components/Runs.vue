@@ -23,7 +23,7 @@
           <template v-for="run in runs">
             <tr v-bind:key="run._id">
               <td nowrap>
-                <router-link :to="'/run/' + run._id">{{run.created}}</router-link>
+                <router-link :to="'/run/' + run._id">{{run.created.replace("T", " ").substr(0,19)}}</router-link>
               </td>
               <td>
                 <router-link :to="'/test/' + run.test._id">{{ run.test.name }}</router-link><br/>

@@ -9,7 +9,14 @@
       <p class="lead">{{test.purpose}}</p>
       <hr class="my-4">
       <p>Browser: {{(browsers[test.browser] ? browsers[test.browser].name : "")}}</p>
-      <p>URL: <a :href="test.urlDomain + test.urlPath" target="_blank" title="Open Default URL in new browser window.">{{test.urlDomain}}{{test.urlPath}}</a></p>
+      <p>
+        URL:
+        <a
+          :href="test.urlDomain + test.urlPath"
+          target="_blank"
+          title="Open Default URL in new browser window."
+        >{{test.urlDomain}}{{test.urlPath}}</a>
+      </p>
 
       <button class="btn btn-primary" v-on:click="saveData();">Save Changes</button>
       <button class="btn btn-secondary" v-on:click="runTest();">Run test</button>
@@ -58,25 +65,35 @@
                   <span class="input-group-text" style="width: 8em;">Browser</span>
                 </div>
                 <select class="form-control" v-model="test.browser">
-                    <option
-                      v-for="(browser, browsername) in browsers"
-                      v-bind:key="browsername"
-                      v-bind:value="browsername"
-                      v-bind:selected="browsername==test.browser"
-                    >{{browser.name}}</option>
-                  </select>
+                  <option
+                    v-for="(browser, browsername) in browsers"
+                    v-bind:key="browsername"
+                    v-bind:value="browsername"
+                    v-bind:selected="browsername==test.browser"
+                  >{{browser.name}}</option>
+                </select>
               </div>
               <div class="input-group mb-3">
                 <div class="input-group-prepend">
                   <span class="input-group-text" style="width: 8em;">URL Domain</span>
                 </div>
-                <input type="text" class="form-control" placeholder="https://www.mydomain.com/" v-model="test.urlDomain">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="https://www.mydomain.com/"
+                  v-model="test.urlDomain"
+                >
               </div>
               <div class="input-group mb-3">
                 <div class="input-group-prepend">
                   <span class="input-group-text" style="width: 8em;">URL Path</span>
                 </div>
-                <input type="text" class="form-control" placeholder="/folder/index.php" v-model="test.urlPath">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="/folder/index.php"
+                  v-model="test.urlPath"
+                >
               </div>
             </div>
           </div>
@@ -262,19 +279,10 @@
 
       <!-- Output/Actions -->
       <div class="col-sm-4">
-        <div class="card" id="testui-actions">
-          <img
-            src="https://media.wired.com/photos/5b3baf1ece9419115f46bb15/master/w_440,c_limit/mac_screenshot-02.jpg"
-            class="card-img-top"
-            alt="..."
-          >
+        <div class="card" id="testui-actions" v-if="activeStep > -1">
           <div class="card-body">
-            <h5 class="card-title">Actions</h5>
-            <p
-              class="card-text"
-            >Screenshot information and other details about last run, plus a "Run up to here" button?</p>
-            <a href="#" class="btn btn-primary">Run up to here</a>
-            <a href="#" class="btn btn-secondary">Reveal HTML</a>
+            <h5 class="card-title">{{commands[test.steps[activeStep].command].name}}</h5>
+            <p class="card-text">{{commands[test.steps[activeStep].command].info}}</p>
           </div>
         </div>
       </div>
@@ -370,16 +378,9 @@ export default {
     },
     runTest() {
       var parent = this;
-      var data = {
-        test: this.$route.params.id,
-        status: "new",
-        browser: this.test.browser,
-        urlDomain: this.test.urlDomain // Only store URL Domain, URL Path is taken from the test
-      };
-      fetch("http://localhost:8081/run", {
+      fetch("http://localhost:8081/test/" + this.$route.params.id + "/run", {
         credentials: "same-origin",
         method: "POST",
-        body: JSON.stringify(data),
         headers: new Headers({
           "Content-Type": "application/json"
         })
@@ -409,9 +410,22 @@ export default {
     commandDescription: function(stepNumber) {
       var step = this.test.steps[stepNumber];
       return this.commands[step.command].friendly
-        .replace("{target}", "<strong>" + (step.target && step.target.query ? step.target.query : "(...)") + "</strong>")
-        .replace("{value}", "<strong>" + (step.value ? step.value : "(...)") + "</strong>")
-        .replace("{expression}", "<strong>" + (step.expression ? step.expression : "(...)") + "</strong>");
+        .replace(
+          "{target}",
+          "<strong>" +
+            (step.target && step.target.query ? step.target.query : "(...)") +
+            "</strong>"
+        )
+        .replace(
+          "{value}",
+          "<strong>" + (step.value ? step.value : "(...)") + "</strong>"
+        )
+        .replace(
+          "{expression}",
+          "<strong>" +
+            (step.expression ? step.expression : "(...)") +
+            "</strong>"
+        );
     },
     addStep: function() {
       this.test.steps.push({
@@ -476,5 +490,4 @@ li.testui-step:not(.active):hover {
   position: sticky;
   top: 60px;
 }
-
 </style>

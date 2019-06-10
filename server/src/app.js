@@ -96,10 +96,29 @@ app.delete('/test/:id', (req, res) => {
     });
 })
 app.get('/test/:id', (req, res) => {
-    var db = req.db;
     Test.findById(req.params.id, function(error, test) {
         if (error) { console.error(error); }
         res.send(test)
+    })
+})
+app.post('/test/:id/run', (req, res) => {
+    Test.findById(req.params.id, function(error, test) {
+        if (error) {
+            console.error(error);
+        }
+        Run.insertMany([{
+            test: req.params.id,
+            status: "new",
+            browser: (req.body.browser ? req.body.browser : test.browser),
+            urlDomain: (req.body.urlDomain ? req.body.urlDomain : test.urlDomain),
+            steps: test.steps,
+            created: new Date()
+        }], function(error, test) {
+            if (error) {
+                console.error(error);
+            }
+            res.send(test)
+        })
     })
 })
 
@@ -120,7 +139,6 @@ app.post('/run', (req, res) => {
         status: req.body.status,
         browser: req.body.browser,
         urlDomain: req.body.urlDomain,
-        steps: req.body.steps,
         created: new Date()
     })
     record.save(function(error) {
@@ -246,11 +264,44 @@ app.delete('/collection/:id', (req, res) => {
 })
 app.get('/collection/:id', (req, res) => {
     var db = req.db;
+    Collection.findById(req.params.id, async function(error, collection) {
+        if (error) { console.error(error); }
+        // Loop through collection tests and find latest run result for each test
+        for (var i = 0; i < collection.tests.length; i++) {
+            // await Run.findOne({ $query: { test: collection.tests[i].test, browser: collection.tests[i].browser, urlDomain: collection.tests[i].urlDomain }, $orderby: { created: -1 } }, async function(error, run) {
+            Run.find()
+            await Run.find({ test: collection.tests[i].test, browser: collection.tests[i].browser, urlDomain: collection.tests[i].urlDomain }, {}, { sort: { created: -1 }, limit: 1 }, async function(error, run) {
+                console.log(run[0].status)
+                collection.tests[i].status = await run[0].status;
+                collection.tests[i].run = await run[0]._id;
+            });
+        }
+        res.send(collection);
+    })
+})
+app.post('/collection/:id/run', (req, res) => {
     Collection.findById(req.params.id, function(error, collection) {
         if (error) { console.error(error); }
-        res.send(collection)
-    }) /*.populate('tests.test', '')*/
-})
+        // Loop through all tests to create runs
+        var runs = [];
+        for (var i = 0; i < collection.tests.length; i++) {
+            runs.push({
+                test: collection.tests[i].test,
+                status: "new",
+                browser: collection.tests[i].browser,
+                urlDomain: collection.tests[i].urlDomain,
+                created: new Date()
+            })
+        }
+        // Insert Run record for each test
+        Run.insertMany(runs, function(error, test) {
+            if (error) {
+                console.error(error);
+            }
+            res.send(test)
+        })
 
+    })
+})
 
 app.listen(process.env.PORT || 8081);
