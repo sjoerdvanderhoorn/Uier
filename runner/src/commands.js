@@ -15,7 +15,7 @@ module.exports = {
         name: "Click Text",
         info: "Use this to execute a mouse click on the first element that contains the mentioned text.",
         fields: ["value"],
-        friendly: "click element with text {target}"
+        friendly: "click element with text {value}"
     },
     input: {
         name: "Input text",

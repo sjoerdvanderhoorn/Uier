@@ -4,6 +4,9 @@
       <div class="jumbotron">
         <h1 class="display-4">Runs</h1>
         <p class="lead">Overview of all runs.</p>
+            <hr class="my-4">
+        <p></p>
+        <button class="btn btn-secondary">Cancel all runs</button>
       </div>
 
       <div v-if="error" class="alert alert-warning">Error: {{ error }}</div>
@@ -26,7 +29,7 @@
                 <router-link :to="'/run/' + run._id">{{run.created.replace("T", " ").substr(0,19)}}</router-link>
               </td>
               <td>
-                <router-link :to="'/test/' + run.test._id">{{ run.test.name }}</router-link><br/>
+                {{run.test.name}}<br/>
                 <span class="text-muted">{{run.test.purpose}}</span>
               </td>
               <td>

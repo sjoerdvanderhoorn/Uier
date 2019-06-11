@@ -22,7 +22,6 @@
         <thead>
           <tr>
             <th>Test</th>
-            <th>Purpose of test</th>
             <th style="width: 150px;">Steps</th>
             <th style="width: 150px;">Last Run</th>
             <th style="width: 150px;">&nbsp;</th>
@@ -32,9 +31,9 @@
           <template v-for="test in tests">
             <tr v-bind:key="test._id">
               <td>
-                <router-link :to="'/test/' + test._id">{{ test.name }}</router-link>
+                <router-link :to="'/test/' + test._id">{{ test.name }}</router-link><br/>
+                <span class="text-muted">{{test.purpose}}</span>
               </td>
-              <td>{{test.purpose}}</td>
               <td>{{test.steps.length}}</td>
               <td>pass/fail?</td>
               <td>

@@ -5,13 +5,37 @@
     <div v-if="error" class="error">Error: {{ error }}</div>
 
     <div class="jumbotron">
-      <h1 class="display-4">{{test.name}}</h1>
-      <p class="lead">
-        Run: {{run.created.replace("T", " ").substr(0,19)}}
-        <span class="badge badge-pill" v-bind:class="{'badge-success':run.status=='pass', 'badge-danger':run.status=='fail', 'badge-primary': run.status!='pass' && run.status != 'fail'}">{{run.status}}</span>
-      </p>
+      <h1 class="display-4">{{run.created.replace("T", " ").substr(0,19)}}</h1>
       <hr class="my-4">
-      <p>Duration: {{((new Date(run.end)).getTime() - (new Date(run.start)).getTime()) / 1000}} seconds</p>
+      <table class="table table-striped">
+        <tbody>
+          <tr>
+            <td>Status</td>
+            <td>
+              <span
+                class="badge badge-pill"
+                v-bind:class="{'badge-success':run.status=='pass', 'badge-danger':run.status=='fail', 'badge-primary': run.status!='pass' && run.status != 'fail'}"
+              >{{run.status}}</span>
+            </td>
+          </tr>
+          <tr>
+            <td style="width: 7em;">Test</td>
+            <td>{{test.name}}</td>
+          </tr>
+          <tr>
+            <td>Domain</td>
+            <td>{{run.urlDomain}}</td>
+          </tr>
+          <tr>
+            <td>Browser</td>
+            <td>{{browsers[run.browser].name}}</td>
+          </tr>
+          <tr>
+            <td>Duration</td>
+            <td>{{((new Date(run.end)).getTime() - (new Date(run.start)).getTime()) / 1000}} seconds</td>
+          </tr>
+        </tbody>
+      </table>
       <button class="btn btn-primary" v-on:click="runTest();">Run again</button>
       <router-link :to="'/test/' + test._id" tag="button" class="btn btn-secondary">Go to test</router-link>
     </div>
@@ -50,13 +74,17 @@
           <img
             :src="'data:image/png;base64,' + (run.steps.length > 0 ? run.steps[activeStep].screenshot : '')"
             class="card-img-top"
-            alt="..."
           >
           <div class="card-body">
-            <h5 class="card-title">Step #{{activeStep + 1}}</h5>
+            <h5 class="card-title">Step #{{activeStep + 1}} of {{run.steps.length}}</h5>
             <p class="card-text">{{(run.steps.length > 0 ? run.steps[activeStep].name : '')}}</p>
-            <div v-if="run.steps[activeStep].error" class="alert alert-danger" role="alert">{{run.steps[activeStep].error}}</div>
-            <a href="#" class="btn btn-primary">Reveal HTML</a>
+            <div
+              v-if="run.steps[activeStep].error"
+              class="alert alert-danger"
+              role="alert"
+            >{{run.steps[activeStep].error}}</div>
+            <button class="btn btn-secondary" v-on:click="activeStep--" :disabled="activeStep==0">Previous</button>
+            <button class="btn btn-secondary" v-on:click="activeStep++" :disabled="activeStep+1 > run.steps.length">Next</button>
           </div>
         </div>
       </div>
@@ -71,6 +99,8 @@ export default {
     return {
       // TestUI system
       activeStep: 0,
+      // Browsers
+      browsers: require("../../../runner/src/browsers.js"),
       // Commands
       commands: require("../../../runner/src/commands.js"),
       // User data
@@ -130,16 +160,29 @@ export default {
     commandDescription: function(stepNumber) {
       var step = this.run.steps[stepNumber];
       return this.commands[step.command].friendly
-        .replace("{target}", "<strong>" + (step.target && step.target.query ? step.target.query : "(...)") + "</strong>")
-        .replace("{value}", "<strong>" + (step.value ? step.value : "(...)") + "</strong>")
-        .replace("{expression}", "<strong>" + (step.expression ? step.expression : "(...)") + "</strong>");
+        .replace(
+          "{target}",
+          "<strong>" +
+            (step.target && step.target.query ? step.target.query : "(...)") +
+            "</strong>"
+        )
+        .replace(
+          "{value}",
+          "<strong>" + (step.value ? step.value : "(...)") + "</strong>"
+        )
+        .replace(
+          "{expression}",
+          "<strong>" +
+            (step.expression ? step.expression : "(...)") +
+            "</strong>"
+        );
     },
     runTest() {
       var parent = this;
       var data = {
         browser: this.run.browser,
         urlDomain: this.run.urlDomain
-      }
+      };
       fetch("http://localhost:8081/test/" + this.test._id + "/run", {
         credentials: "same-origin",
         method: "POST",

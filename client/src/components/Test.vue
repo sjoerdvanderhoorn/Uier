@@ -283,6 +283,46 @@
           <div class="card-body">
             <h5 class="card-title">{{commands[test.steps[activeStep].command].name}}</h5>
             <p class="card-text">{{commands[test.steps[activeStep].command].info}}</p>
+            <h6 class="card-title">Name</h6>
+            <p
+              class="card-text"
+            >Your description of what this step is supposed to do. This can be plain English or any other language of choice. Eg: <mark>Enter a search string for "milk".</mark></p>
+            <template v-if="commands[test.steps[activeStep].command].fields.includes('target')">
+              <h6 class="card-title">Target</h6>
+              <p
+                class="card-text"
+              >Provides the reference for the HTML element that the <b>{{commands[test.steps[activeStep].command].name}}</b> command should apply to. Change the method using which the element is identified. This can for example be by the elements Name or ID property, using a CSS selector, or using XPath syntax.</p>
+              <h6 class="card-title" v-if="test.steps[activeStep].target.type=='css'">CSS selector</h6>
+              <p class="card-text" v-if="test.steps[activeStep].target.type=='css'">
+                In CSS, selectors are patterns used to select the element(s) you want to style. Common examples are
+                <mark>#fieldId</mark>,
+                <mark>.className</mark>, and
+                <mark>htmlElementName</mark>. Also see the w3schools
+                <a
+                  href="https://www.w3schools.com/cssref/css_selectors.asp"
+                  target="_blank"
+                >cheatsheet</a> reference.
+              </p>
+              <h6 class="card-title" v-if="test.steps[activeStep].target.type=='xpath'">XPath</h6>
+              <p class="card-text" v-if="test.steps[activeStep].target.type=='xpath'">
+                XPath can be used to navigate through elements and attributes in an XML document. Expressions can be made using
+                <mark>/rootNode</mark>,
+                <mark>./currentNode</mark>,
+                <mark>../parentNode</mark>, or
+                <mark>@attribute</mark>.
+                See a more comprehensive
+                <a
+                  href="https://www.w3schools.com/xml/xpath_syntax.asp"
+                  target="_blank"
+                >syntax description</a> on w3schools.
+              </p>
+            </template>
+            <template v-if="commands[test.steps[activeStep].command].fields.includes('value')">
+              <h6 class="card-title">Value</h6>
+              <p
+                class="card-text"
+              >The value to be used by the <b>{{commands[test.steps[activeStep].command].name}}</b> command.</p>
+            </template>
           </div>
         </div>
       </div>

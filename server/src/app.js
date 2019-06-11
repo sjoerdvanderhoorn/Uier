@@ -17,7 +17,7 @@ var db = mongodb_conn_module.connect();
 var Test = require("../models/test");
 
 app.get('/test', (req, res) => {
-    Test.find({}, 'name purpose browser urlDomain urlPath created updated steps.name', function(error, data) {
+    Test.find({}, 'name purpose browser urlDomain urlPath created updated steps.name', function (error, data) {
         if (error) { console.error(error); }
         res.send(data);
     }).sort({ _id: -1 })
@@ -32,7 +32,7 @@ app.post('/test', (req, res) => {
         steps: req.body.steps,
         created: new Date()
     })
-    record.save(function(error) {
+    record.save(function (error) {
         if (error) {
             console.log(error)
         }
@@ -43,8 +43,7 @@ app.post('/test', (req, res) => {
     })
 })
 app.put('/test/:id', (req, res) => {
-    var db = req.db;
-    Test.findById(req.params.id, function(error, record) {
+    Test.findById(req.params.id, function (error, record) {
         if (error) { console.error(error); }
         if (record) {
             record.name = req.body.name;
@@ -54,7 +53,7 @@ app.put('/test/:id', (req, res) => {
             record.urlPath = req.body.urlPath;
             record.steps = req.body.steps;
             record.updated = new Date()
-            record.save(function(error) {
+            record.save(function (error) {
                 if (error) {
                     console.log(error)
                 }
@@ -69,19 +68,19 @@ app.delete('/test/:id', (req, res) => {
     // Remove all runs
     Run.deleteMany({
         test: req.params.id
-    }, function(err, test) {
+    }, function (err, test) {
         if (err) {
             res.send(err);
         } else {
             // Remove from all collections
-            Collection.updateMany({ "tests.test": req.params.id }, { updated: new Date(), $pull: { tests: { test: req.params.id } } }, function(err, test) {
+            Collection.updateMany({ "tests.test": req.params.id }, { updated: new Date(), $pull: { tests: { test: req.params.id } } }, function (err, test) {
                 if (err) {
                     res.send(err);
                 } else {
                     // Remove actual test
                     Test.remove({
                         _id: req.params.id
-                    }, function(err, test) {
+                    }, function (err, test) {
                         if (err) {
                             res.send(err)
                         }
@@ -96,13 +95,13 @@ app.delete('/test/:id', (req, res) => {
     });
 })
 app.get('/test/:id', (req, res) => {
-    Test.findById(req.params.id, function(error, test) {
+    Test.findById(req.params.id, function (error, test) {
         if (error) { console.error(error); }
         res.send(test)
     })
 })
 app.post('/test/:id/run', (req, res) => {
-    Test.findById(req.params.id, function(error, test) {
+    Test.findById(req.params.id, function (error, test) {
         if (error) {
             console.error(error);
         }
@@ -113,7 +112,7 @@ app.post('/test/:id/run', (req, res) => {
             urlDomain: (req.body.urlDomain ? req.body.urlDomain : test.urlDomain),
             steps: test.steps,
             created: new Date()
-        }], function(error, test) {
+        }], function (error, test) {
             if (error) {
                 console.error(error);
             }
@@ -128,7 +127,7 @@ app.post('/test/:id/run', (req, res) => {
 var Run = require("../models/run");
 
 app.get('/run', (req, res) => {
-    Run.find({}, 'created status start end browser urlDomain test', function(error, data) {
+    Run.find({}, 'created status start end browser urlDomain test', function (error, data) {
         if (error) { console.error(error); }
         res.send(data);
     }).populate('test', 'name purpose urlPath').sort({ _id: -1 })
@@ -141,7 +140,7 @@ app.post('/run', (req, res) => {
         urlDomain: req.body.urlDomain,
         created: new Date()
     })
-    record.save(function(error) {
+    record.save(function (error) {
         if (error) {
             console.log(error)
         }
@@ -152,8 +151,7 @@ app.post('/run', (req, res) => {
     })
 })
 app.put('/run/:id', (req, res) => {
-    var db = req.db;
-    Run.findById(req.params.id, function(error, record) {
+    Run.findById(req.params.id, function (error, record) {
         if (error) { console.error(error); }
         if (record) {
             record.name = req.body.name;
@@ -165,7 +163,7 @@ app.put('/run/:id', (req, res) => {
             record.start = req.body.start;
             record.end = req.body.end;
             record.updated = new Date()
-            record.save(function(error) {
+            record.save(function (error) {
                 if (error) {
                     console.log(error)
                 }
@@ -177,10 +175,9 @@ app.put('/run/:id', (req, res) => {
     })
 })
 app.delete('/run/:id', (req, res) => {
-    var db = req.db;
     Run.remove({
         _id: req.params.id
-    }, function(err, run) {
+    }, function (err, run) {
         if (err)
             res.send(err)
         res.send({
@@ -189,14 +186,13 @@ app.delete('/run/:id', (req, res) => {
     })
 })
 app.get('/run/:id', (req, res) => {
-    var db = req.db;
-    Run.findById(req.params.id, function(error, run) {
+    Run.findById(req.params.id, function (error, run) {
         if (error) { console.error(error); }
         res.send(run)
     }).populate('test', '')
 })
 app.get('/run_first', (req, res) => {
-    Run.findOne({ status: "new" }, '', function(error, data) {
+    Run.findOne({ status: "new" }, '', function (error, data) {
         if (error) { console.error(error); }
         res.send(data);
     }).sort({ created: 1 }).populate('test', '')
@@ -209,7 +205,7 @@ app.get('/run_first', (req, res) => {
 var Collection = require("../models/collection");
 
 app.get('/collection', (req, res) => {
-    Collection.find({}, 'name description created updated tests.test', function(error, data) {
+    Collection.find({}, 'name description created updated tests.test', function (error, data) {
         if (error) { console.error(error); }
         res.send(data);
     }).sort({ _id: -1 })
@@ -220,7 +216,7 @@ app.post('/collection', (req, res) => {
         description: req.body.description,
         created: new Date()
     })
-    record.save(function(error) {
+    record.save(function (error) {
         if (error) {
             console.log(error)
         }
@@ -231,15 +227,14 @@ app.post('/collection', (req, res) => {
     })
 })
 app.put('/collection/:id', (req, res) => {
-    var db = req.db;
-    Collection.findById(req.params.id, function(error, record) {
+    Collection.findById(req.params.id, function (error, record) {
         if (error) { console.error(error); }
         if (record) {
             record.name = req.body.name;
             record.description = req.body.description;
             record.tests = req.body.tests;
             record.updated = new Date();
-            record.save(function(error) {
+            record.save(function (error) {
                 if (error) {
                     console.log(error)
                 }
@@ -251,10 +246,9 @@ app.put('/collection/:id', (req, res) => {
     })
 })
 app.delete('/collection/:id', (req, res) => {
-    var db = req.db;
     Collection.remove({
         _id: req.params.id
-    }, function(err, collection) {
+    }, function (err, collection) {
         if (err)
             res.send(err)
         res.send({
@@ -263,24 +257,22 @@ app.delete('/collection/:id', (req, res) => {
     })
 })
 app.get('/collection/:id', (req, res) => {
-    var db = req.db;
-    Collection.findById(req.params.id, async function(error, collection) {
+    Collection.findById(req.params.id, async function (error, collection) {
         if (error) { console.error(error); }
         // Loop through collection tests and find latest run result for each test
         for (var i = 0; i < collection.tests.length; i++) {
-            // await Run.findOne({ $query: { test: collection.tests[i].test, browser: collection.tests[i].browser, urlDomain: collection.tests[i].urlDomain }, $orderby: { created: -1 } }, async function(error, run) {
-            Run.find()
-            await Run.find({ test: collection.tests[i].test, browser: collection.tests[i].browser, urlDomain: collection.tests[i].urlDomain }, {}, { sort: { created: -1 }, limit: 1 }, async function(error, run) {
-                console.log(run[0].status)
-                collection.tests[i].status = await run[0].status;
-                collection.tests[i].run = await run[0]._id;
+            await Run.find({ test: collection.tests[i].test, browser: collection.tests[i].browser, urlDomain: collection.tests[i].urlDomain }, {}, { sort: { created: -1 }, limit: 1 }, async function (error, run) {
+                if (run.length > 0) {
+                    collection.tests[i].status = await run[0].status;
+                    collection.tests[i].run = await run[0]._id;
+                }
             });
         }
         res.send(collection);
     })
 })
 app.post('/collection/:id/run', (req, res) => {
-    Collection.findById(req.params.id, function(error, collection) {
+    Collection.findById(req.params.id, function (error, collection) {
         if (error) { console.error(error); }
         // Loop through all tests to create runs
         var runs = [];
@@ -294,7 +286,7 @@ app.post('/collection/:id/run', (req, res) => {
             })
         }
         // Insert Run record for each test
-        Run.insertMany(runs, function(error, test) {
+        Run.insertMany(runs, function (error, test) {
             if (error) {
                 console.error(error);
             }
