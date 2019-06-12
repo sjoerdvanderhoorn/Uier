@@ -23,19 +23,17 @@
         <!-- Sidebar -->
         <nav class="col-md-2 d-none d-md-block bg-light sidebar">
           <div class="sidebar-sticky">
+            <h6
+              class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted"
+            >
+              <span>Definition</span>
+            </h6>
             <ul class="nav flex-column">
               <!-- <li class="nav-item">
                 <router-link to="/" exact class="nav-link" active-class="active">
                   <span data-feather="home"></span> Dashboard
                 </router-link>
               </li>-->
-
-              <h6
-                class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted"
-              >
-                <span>Actions</span>
-              </h6>
-
               <li class="nav-item">
                 <router-link to="/tests" class="nav-link" active-class="active">
                   <span data-feather="box"></span> Tests
@@ -46,6 +44,13 @@
                   <span data-feather="codesandbox"></span> Collections
                 </router-link>
               </li>
+            </ul>
+            <h6
+              class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted"
+            >
+              <span>Execution</span>
+            </h6>
+            <ul class="nav flex-column">
               <li class="nav-item">
                 <router-link to="/runs" class="nav-link" active-class="active">
                   <span data-feather="git-commit"></span> Runs

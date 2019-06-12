@@ -1,5 +1,5 @@
 const fetch = require('node-fetch');
-const runner = require("./src/runner.js");
+const runner = require("./runner.js");
 
 var loop = {
     newRun: async function(run) {

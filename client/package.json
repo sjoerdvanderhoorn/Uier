@@ -1,7 +1,7 @@
 {
-    "name": "uier",
-    "version": "1.0.0",
-    "description": "A Vue.js project",
+    "name": "client",
+    "version": "0.3.0",
+    "description": "Uier frontend application.",
     "author": "Sjoerd van der Hoorn",
     "private": true,
     "scripts": {

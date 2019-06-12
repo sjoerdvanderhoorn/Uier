@@ -1,7 +1,7 @@
 {
   "name": "server",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.3.0",
+  "description": "REST API to connect client and runner.",
   "main": "index.js",
   "scripts": {
     "dev": "node ./node_modules/nodemon/bin/nodemon.js src/app.js",
@@ -9,7 +9,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "Sjoerd van der Hoorn",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.18.1",

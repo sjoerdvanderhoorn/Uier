@@ -3,10 +3,14 @@ const chrome = require('selenium-webdriver/chrome');
 const firefox = require('selenium-webdriver/firefox');
 
 // Settings
+
 let firefoxOptions = new firefox.Options();
-firefoxOptions.windowSize({ width: 300, height: 400 });
+firefoxOptions.windowSize({ width: 800, height: 600 });
+const firefoxServiceBuilder = new firefox.ServiceBuilder(__dirname + "/../drivers/geckodriver.exe");
+
 let chromeOptions = new chrome.Options();
 chromeOptions.windowSize({ width: 800, height: 600 });
+chrome.setDefaultService(new chrome.ServiceBuilder(__dirname + "/../drivers/chromedriver.exe").build());
 
 module.exports = {
     run: async function(run) {
@@ -20,6 +24,7 @@ module.exports = {
                 'browserstack.localIdentifier': 'uierRun'
             })
             .forBrowser(run.browser)
+            .setFirefoxService(firefoxServiceBuilder)
             .build();
         // Navigate to start URL
         await driver.get(run.urlDomain + run.test.urlPath);

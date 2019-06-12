@@ -1,10 +1,10 @@
 {
   "name": "runner",
-  "version": "1.0.0",
+  "version": "0.3.0",
   "description": "Runs Uier test scripts using the selenium webdriver.",
   "main": "index.js",
   "scripts": {
-    "dev": "node ./node_modules/nodemon/bin/nodemon.js index.js",
+    "dev": "node ./node_modules/nodemon/bin/nodemon.js src/app.js",
     "start": "npm run dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
