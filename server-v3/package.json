@@ -1,0 +1,27 @@
+{
+  "name": "server",
+  "version": "0.3.0",
+  "description": "REST API to connect client and runner.",
+  "main": "index.js",
+  "scripts": {
+	"migrate": "knex migrate:latest && knex seed:run",
+    "dev": "npm run migrate && node ./node_modules/nodemon/bin/nodemon.js src/app.js",
+    "start": "npm run dev",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Sjoerd van der Hoorn",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-promise-router": "^3.0.3",
+    "knex": "^0.17.6",
+    "morgan": "^1.9.1",
+    "mysql": "^2.17.1",
+    "nodemon": "^1.19.1",
+    "objection": "^1.6.9",
+    "sqlite3": "^4.0.9"
+  }
+}
