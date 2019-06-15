@@ -3,13 +3,14 @@ const runner = require("./runner.js");
 
 var loop = {
     newRun: async function(run) {
-        console.log("Running", run._id);
+        console.log("Running", run.uid);
         // Set status to "running"
-        run.status = "running";
-        run.start = new Date();
-        fetch("http://localhost:8081/run/" + run._id, {
-            method: "PUT",
-            body: JSON.stringify(run),
+        fetch("http://localhost:8081/run/" + run.uid, {
+            method: "PATCH",
+            body: JSON.stringify({
+                status: "running",
+                start: new Date()
+            }),
             headers: {
                 "Content-Type": "application/json"
             }
@@ -20,7 +21,7 @@ var loop = {
         run.status = results.status;
         run.end = new Date();
         run.steps = results.steps;
-        fetch("http://localhost:8081/run/" + run._id, {
+        fetch("http://localhost:8081/run/" + run.uid, {
             method: "PUT",
             body: JSON.stringify(run),
             headers: {
@@ -29,7 +30,7 @@ var loop = {
         });
     },
     checkNewRun: function() {
-        fetch("http://localhost:8081/run_first")
+        fetch("http://localhost:8081/run/next")
             .then(function(response) {
                 return response.text();
             })

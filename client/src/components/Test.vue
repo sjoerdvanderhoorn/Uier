@@ -197,41 +197,41 @@
                             aria-haspopup="true"
                             aria-expanded="false"
                             style="background-color: white; border-right: none; border-color: #ced4da; color: #ced4da;"
-                          >{{step.target.type}}&nbsp;</button>
+                          >{{step.target_type}}&nbsp;</button>
                           <div class="dropdown-menu">
                             <a
                               class="dropdown-item"
-                              v-on:click="step.target.type='css'"
+                              v-on:click="step.target_type='css'"
                             >CSS selector</a>
                             <div role="separator" class="dropdown-divider"></div>
-                            <a class="dropdown-item" v-on:click="step.target.type='id'">ID tag</a>
-                            <a class="dropdown-item" v-on:click="step.target.type='name'">Name tag</a>
+                            <a class="dropdown-item" v-on:click="step.target_type='id'">ID tag</a>
+                            <a class="dropdown-item" v-on:click="step.target_type='name'">Name tag</a>
                             <a
                               class="dropdown-item"
-                              v-on:click="step.target.type='className'"
+                              v-on:click="step.target_type='className'"
                             >Class Name</a>
                             <div role="separator" class="dropdown-divider"></div>
                             <a
                               class="dropdown-item"
-                              v-on:click="step.target.type='js'"
+                              v-on:click="step.target_type='js'"
                             >Javascript expression</a>
                             <div role="separator" class="dropdown-divider"></div>
                             <a
                               class="dropdown-item"
-                              v-on:click="step.target.type='linkText'"
+                              v-on:click="step.target_type='linkText'"
                             >Link Text</a>
                             <a
                               class="dropdown-item"
-                              v-on:click="step.target.type='partialLinkText'"
+                              v-on:click="step.target_type='partialLinkText'"
                             >Partial Link Text</a>
                             <div role="separator" class="dropdown-divider"></div>
-                            <a class="dropdown-item" v-on:click="step.target.type='xpath'">xpath</a>
+                            <a class="dropdown-item" v-on:click="step.target_type='xpath'">xpath</a>
                           </div>
                         </div>
                         <input
                           type="text"
                           class="form-control"
-                          v-model="step.target.query"
+                          v-model="step.target_query"
                           v-if="commands[step.command].fields.includes('target')"
                           placeholder="Target"
                         >
@@ -292,8 +292,8 @@
               <p
                 class="card-text"
               >Provides the reference for the HTML element that the <b>{{commands[test.steps[activeStep].command].name}}</b> command should apply to. Change the method using which the element is identified. This can for example be by the elements Name or ID property, using a CSS selector, or using XPath syntax.</p>
-              <h6 class="card-title" v-if="test.steps[activeStep].target.type=='css'">CSS selector</h6>
-              <p class="card-text" v-if="test.steps[activeStep].target.type=='css'">
+              <h6 class="card-title" v-if="test.steps[activeStep].target_type=='css'">CSS selector</h6>
+              <p class="card-text" v-if="test.steps[activeStep].target_type=='css'">
                 In CSS, selectors are patterns used to select the element(s) you want to style. Common examples are
                 <mark>#fieldId</mark>,
                 <mark>.className</mark>, and
@@ -303,8 +303,8 @@
                   target="_blank"
                 >cheatsheet</a> reference.
               </p>
-              <h6 class="card-title" v-if="test.steps[activeStep].target.type=='xpath'">XPath</h6>
-              <p class="card-text" v-if="test.steps[activeStep].target.type=='xpath'">
+              <h6 class="card-title" v-if="test.steps[activeStep].target_type=='xpath'">XPath</h6>
+              <p class="card-text" v-if="test.steps[activeStep].target_type=='xpath'">
                 XPath can be used to navigate through elements and attributes in an XML document. Expressions can be made using
                 <mark>/rootNode</mark>,
                 <mark>./currentNode</mark>,
@@ -418,9 +418,14 @@ export default {
     },
     runTest() {
       var parent = this;
+      var data = {
+        browser: this.test.browser,
+        urlDomain: this.test.urlDomain
+      }
       fetch("http://localhost:8081/test/" + this.$route.params.id + "/run", {
         credentials: "same-origin",
         method: "POST",
+        body: JSON.stringify(data),
         headers: new Headers({
           "Content-Type": "application/json"
         })
@@ -453,7 +458,7 @@ export default {
         .replace(
           "{target}",
           "<strong>" +
-            (step.target && step.target.query ? step.target.query : "(...)") +
+            (step.target_query ? step.target_query : "(...)") +
             "</strong>"
         )
         .replace(
@@ -471,7 +476,9 @@ export default {
       this.test.steps.push({
         name: "",
         command: "click",
-        target: { query: "", type: "css" }
+        target_query: "",
+        target_type: "css",
+        value: ""
       });
       this.activeStep = this.test.steps.length - 1;
     },

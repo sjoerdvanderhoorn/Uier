@@ -24,13 +24,13 @@
         </thead>
         <tbody>
           <template v-for="run in runs">
-            <tr v-bind:key="run._id">
+            <tr v-bind:key="run.uid">
               <td nowrap>
-                <router-link :to="'/run/' + run._id">{{run.created.replace("T", " ").substr(0,19)}}</router-link>
+                <router-link :to="'/run/' + run.uid">{{run.created.replace("T", " ").substr(0,19)}}</router-link>
               </td>
               <td>
-                {{run.test.name}}<br/>
-                <span class="text-muted">{{run.test.purpose}}</span>
+                {{run.test_name}}<br/>
+                <span class="text-muted">{{run.test_purpose}}</span>
               </td>
               <td>
                 {{browsers[run.browser].name}}<br/>
@@ -49,7 +49,7 @@
                 >{{run.status}}</span>
               </td>
               <td>
-                <button class="btn btn-danger" title="Remove" v-on:click="removeRun(run._id)">x</button>
+                <button class="btn btn-danger" title="Remove" v-on:click="removeRun(run.uid)">x</button>
               </td>
             </tr>
           </template>

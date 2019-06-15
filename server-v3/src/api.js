@@ -1,201 +1,21 @@
 'use strict';
 
 const { transaction } = require('objection');
-const Person = require('../models/Person');
-const Movie = require('../models/Movie');
-
 
 const Organization = require('../models/Organization');
 const User = require('../models/User');
 const UserRole = require('../models/UserRole');
 const Test = require('../models/Test');
 const TestStep = require('../models/TestStep');
+const Collection = require('../models/Collection');
+const CollectionTest = require('../models/CollectionTest');
+const Run = require('../models/Run');
+const RunStep = require('../models/RunStep');
 
+
+var tempOrganization = 1;
 
 module.exports = router => {
-  // Create a new Person. Because we use `insertGraph` you can pass relations
-  // with the person and they also get inserted and related to the person. If
-  // all you want to do is insert a single person, `insertGraph` and `allowInsert`
-  // can be replaced by `insert(req.body)`.
-  router.post('/persons', async (req, res) => {
-    const graph = req.body;
-
-    // It's a good idea to wrap `insertGraph` call in a transaction since it
-    // may create multiple queries.
-    const insertedGraph = await transaction(Person.knex(), trx => {
-      return (
-        Person.query(trx)
-          // For security reasons, limit the relations that can be inserted.
-          .allowInsert('[pets, children.[pets, movies], movies, parent]')
-          .insertGraph(graph)
-      );
-    });
-
-    res.send(insertedGraph);
-  });
-
-  // Patch a single Person.
-  router.patch('/persons/:id', async (req, res) => {
-    const person = await Person.query().patchAndFetchById(req.params.id, req.body);
-
-    res.send(person);
-  });
-
-  // Get multiple Persons. The result can be filtered using query parameters
-  // `minAge`, `maxAge` and `firstName`. Relations can be fetched eagerly
-  // by giving a relation expression as the `eager` query parameter.
-  router.get('/persons', async (req, res) => {
-    // We don't need to check for the existence of the query parameters because
-    // we call the `skipUndefined` method. It causes the query builder methods
-    // to do nothing if one of the values is undefined.
-    const persons = await Person.query()
-      .skipUndefined()
-      // For security reasons, limit the relations that can be fetched.
-      .allowEager('[pets, parent, children.[pets, movies.actors], movies.actors.pets]')
-      .eager(req.query.eager)
-      .where('age', '>=', req.query.minAge)
-      .where('age', '<', req.query.maxAge)
-      .where('firstName', 'like', req.query.firstName)
-      .orderBy('firstName')
-      // Order eagerly loaded pets by name.
-      .modifyEager('[pets, children.pets]', qb => qb.orderBy('name'));
-
-    res.send(persons);
-  });
-
-  // Delete a person.
-  router.delete('/persons/:id', async (req, res) => {
-    await Person.query().deleteById(req.params.id);
-
-    res.send({});
-  });
-
-  // Add a child for a Person.
-  router.post('/persons/:id/children', async (req, res) => {
-    const person = await Person.query().findById(req.params.id);
-
-    if (!person) {
-      throw createStatusCodeError(404);
-    }
-
-    const child = await person.$relatedQuery('children').insert(req.body);
-
-    res.send(child);
-  });
-
-  // Add a pet for a Person.
-  router.post('/persons/:id/pets', async (req, res) => {
-    const person = await Person.query().findById(req.params.id);
-
-    if (!person) {
-      throw createStatusCodeError(404);
-    }
-
-    const pet = await person.$relatedQuery('pets').insert(req.body);
-
-    res.send(pet);
-  });
-
-  // Get a Person's pets. The result can be filtered using query parameters
-  // `name` and `species`.
-  router.get('/persons/:id/pets', async (req, res) => {
-    const person = await Person.query().findById(req.params.id);
-
-    if (!person) {
-      throw createStatusCodeError(404);
-    }
-
-    // We don't need to check for the existence of the query parameters because
-    // we call the `skipUndefined` method. It causes the query builder methods
-    // to do nothing if one of the values is undefined.
-    const pets = await person
-      .$relatedQuery('pets')
-      .skipUndefined()
-      .where('name', 'like', req.query.name)
-      .where('species', req.query.species);
-
-    res.send(pets);
-  });
-
-  // Add a movie for a Person.
-  router.post('/persons/:id/movies', async (req, res) => {
-    // Inserting a movie for a person creates two queries: the movie insert query
-    // and the join table row insert query. It is wise to use a transaction here.
-    const movie = await transaction(Person.knex(), async trx => {
-      const person = await Person.query(trx).findById(req.params.id);
-
-      if (!person) {
-        throw createStatusCodeError(404);
-      }
-
-      return await person.$relatedQuery('movies', trx).insert(req.body);
-    });
-
-    res.send(movie);
-  });
-
-  // Add existing Person as an actor to a movie.
-  router.post('/movies/:id/actors', async (req, res) => {
-    const movie = await Movie.query().findById(req.params.id);
-
-    if (!movie) {
-      throw createStatusCodeError(404);
-    }
-
-    await movie.$relatedQuery('actors').relate(req.body.id);
-
-    res.send(req.body);
-  });
-
-  // Get Movie's actors.
-  router.get('/movies/:id/actors', async (req, res) => {
-    const movie = await Movie.query().findById(req.params.id);
-
-    if (!movie) {
-      throw createStatusCodeError(404);
-    }
-
-    const actors = await movie.$relatedQuery('actors');
-    res.send(actors);
-  });
-
-  // Patch a person and upsert its relations.
-  router.patch('/persons/:id/upsert', async (req, res) => {
-    const graph = req.body;
-
-    // Make sure only one person was sent.
-    if (Array.isArray(graph)) {
-      throw createStatusCodeError(400);
-    }
-
-    // Make sure the person has the correct id because `upsertGraph` uses the id fields
-    // to determine which models need to be updated and which inserted.
-    graph.id = parseInt(req.params.id, 10);
-
-    // It's a good idea to wrap `upsertGraph` call in a transaction since it
-    // may create multiple queries.
-    const upsertedGraph = await transaction(Person.knex(), trx => {
-      return (
-        Person.query(trx)
-          // For security reasons, limit the relations that can be upserted.
-          .allowUpsert('[pets, children.[pets, movies], movies, parent]')
-          .upsertGraph(graph)
-      );
-    });
-
-    res.send(upsertedGraph);
-  });
-
-
-
-
-
-
-
-
-
-
-
 
   // --- Organization ---
 
@@ -241,7 +61,8 @@ module.exports = router => {
     const users = await User.query().findOne({ uid: req.params.uid, password: req.body.old });
     let updatedUsers;
     if (users) {
-      updatedUsers = await users.$query().patchAndFetch({ password: req.body.new });
+      await users.$query().patchAndFetch({ password: req.body.new });
+      updatedUsers = { message: "Password changed." }
     }
     else {
       updatedUsers = { error: "Old password does not match." }
@@ -259,14 +80,21 @@ module.exports = router => {
 
   router.get('/test', async (req, res) => {
     const tests = await Test.query()
-      .eager('steps')
+      .where({ organization: tempOrganization })
       .omit(Test, ['id', 'organization'])
-      .omit(TestStep, ['id', 'test'])
+      .leftJoin('tests_steps', function () {
+        this.on('tests_steps.test', '=', 'tests.id')
+      })
+      .select(['tests.uid', 'tests.name', 'tests.purpose', 'tests.browser', 'tests.urlDomain', 'tests.urlPath'])
+      .groupBy(['tests.uid'])
+      .count({ 'stepCount': 'tests_steps.id' })
     res.send(tests);
   });
 
   router.get('/test/:uid', async (req, res) => {
-    const tests = await Test.query().findOne({ uid: req.params.uid })
+    const tests = await Test.query()
+      .findOne({ uid: req.params.uid })
+      .where({ organization: tempOrganization })
       .eager('steps')
       .omit(Test, ['id', 'organization'])
       .omit(TestStep, ['id', 'test'])
@@ -275,23 +103,279 @@ module.exports = router => {
 
   router.post('/test', async (req, res) => {
     const graph = req.body;
+    graph.organization = tempOrganization;
     const insertedGraph = await transaction(Test.knex(), trx => {
       return (
         Test.query(trx)
           .allowInsert('[steps]')
           .insertGraph(graph)
-          .omit(Test, ['id'])
+        //.omit(Test, ['id'])
+        //.omit(TestStep, ['id', 'test'])
+      );
+    });
+    const tests = await Test.query()
+      .findById(insertedGraph.id)
+      .where({ organization: tempOrganization })
+      .eager('steps')
+      .omit(Test, ['id', 'organization'])
+      .omit(TestStep, ['id', 'test'])
+    res.send(tests);
+  });
+
+  router.put('/test/:uid', async (req, res) => {
+    // Find current test ID
+    const tests = await Test.query()
+      .findOne({ uid: req.params.uid })
+      .where({ organization: tempOrganization })
+      .select('id')
+    // Create update object
+    const graph = req.body;
+    graph.id = tests.id;
+    graph.organization = tempOrganization;
+    // Update
+    const insertedGraph = await transaction(Test.knex(), trx => {
+      return (
+        Test.query(trx)
+          .findOne({ uid: req.params.uid }).where({ organization: tempOrganization })
+          .allowUpsert('[steps]')
+          .upsertGraph(graph, {})
+          .omit(Test, ['id', 'organization'])
           .omit(TestStep, ['id', 'test'])
       );
     });
     res.send(insertedGraph);
   });
 
-  // --- Run ---
+  router.delete('/test/:uid', async (req, res) => {
+    const numberOfDeletedRows = await Test.query()
+      .delete()
+      .where('uid', req.params.uid)
+      .where({ organization: tempOrganization });
+    res.send({ numberOfDeletedRows: numberOfDeletedRows });
+  });
+
+
   // --- Collection ---
 
+  router.get('/collection', async (req, res) => {
+    const collections = await Collection.query()
+      .where({ organization: tempOrganization })
+      .omit(Collection, ['id', 'organization'])
+      .leftJoin('collections_tests', function () {
+        this.on('collections_tests.collection', '=', 'collections.id')
+      })
+      .select(['collections.uid', 'collections.name', 'collections.description'])
+      .groupBy(['collections.uid'])
+      .count({ 'testCount': 'collections_tests.id' })
+    res.send(collections);
+  });
+
+  router.get('/collection/:uid', async (req, res) => {
+    const collections = await Collection.query()
+      .findOne({ 'collections.uid': req.params.uid })
+      .where({ 'collections.organization': tempOrganization })
+      .eager('tests', 'tests.[tests]')
+      .omit(Collection, ['id', 'organization'])
+      .omit(CollectionTest, ['id', 'collection'])
+    res.send(collections);
+  });
+
+  router.post('/collection', async (req, res) => {
+    const graph = req.body;
+    graph.organization = tempOrganization;
+    const insertedGraph = await transaction(Collection.knex(), trx => {
+      return (
+        Collection.query(trx)
+          .allowInsert('[tests]')
+          .insertGraph(graph)
+      );
+    });
+    const collections = await Collection.query()
+      .findById(insertedGraph.id)
+      .where({ organization: tempOrganization })
+      .eager('tests')
+      .omit(Collection, ['id', 'organization'])
+      .omit(CollectionTest, ['id', 'collection'])
+    res.send(collections);
+  });
+
+  router.put('/collection/:uid', async (req, res) => {
+    // Find current collection ID
+    const collections = await Collection.query()
+      .findOne({ uid: req.params.uid })
+      .where({ organization: tempOrganization })
+      .select('id')
+    // Create update object
+    const graph = req.body;
+    graph.id = collections.id;
+    graph.organization = tempOrganization;
+    console.log(graph)
+    // Update
+    const insertedGraph = await transaction(Collection.knex(), trx => {
+      return (
+        Collection.query(trx)
+          .findOne({ uid: req.params.uid }).where({ organization: tempOrganization })
+          .allowUpsert('[tests]')
+          .upsertGraph(graph, {})
+          .omit(Collection, ['id', 'organization'])
+          .omit(CollectionTest, ['id', 'collection'])
+      );
+    });
+    res.send(insertedGraph);
+  });
+
+  router.delete('/collection/:uid', async (req, res) => {
+    const numberOfDeletedRows = await Collection.query()
+      .delete()
+      .where('uid', req.params.uid)
+      .where({ organization: tempOrganization });
+    res.send({ numberOfDeletedRows: numberOfDeletedRows });
+  });
 
 
+  // --- Run ---
+
+  router.get('/run', async (req, res) => {
+    const runs = await Run.query()
+      .where({ 'runs.organization': tempOrganization })
+      .omit(Run, ['id', 'organization'])
+      .leftJoin('tests', function () {
+        this.on('runs.test', '=', 'tests.uid')
+      })
+      .orderBy('runs.created', 'desc')
+      .select([
+        'runs.uid',
+        'runs.test',
+        { 'test_name': 'tests.name' },
+        { 'test_purpose': 'tests.purpose' },
+        'runs.created',
+        'runs.status',
+        'runs.browser',
+        'runs.urlDomain',
+        'runs.start',
+        'runs.end']);
+
+    res.send(runs);
+  });
+
+  router.get('/run/next', async (req, res) => {
+    var runs = await Run.query().where({ status: "new" }).first()
+    runs.steps = await TestStep.query()
+    //.findOne({ 'runs.uid': req.params.uid })
+    //.where({ 'runs.organization': tempOrganization })
+    //.eager('steps')
+    //.omit(Run, ['id', 'organization'])
+    //.omit(RunStep, ['id', 'run'])
+    /*
+    .leftJoin('tests', function () {
+      this.on('runs.test', '=', 'tests.uid')
+    })
+    */
+    /*
+    .select([
+      'runs.id',
+      'runs.organization',
+      'runs.uid',
+      'runs.test',
+      { 'test_name': 'tests.name' },
+      { 'test_purpose': 'tests.purpose' },
+      'runs.created',
+      'runs.status',
+      'runs.browser',
+      'runs.urlDomain',
+      'runs.start',
+      'runs.end']);
+      */
+    res.send(runs);
+  });
+
+  router.patch('/run/:uid', async (req, res) => {
+    const runs = await Run.query().findOne({ uid: req.params.uid });
+    let updatedRuns;
+    if (runs) {
+      await runs.$query().patchAndFetch({ status: req.body.status, start: req.body.start });
+      updatedRuns = { message: "Run started." }
+    }
+    else {
+      updatedRuns = { error: "Run not found." }
+    }
+    res.send(updatedRuns);
+  });
+
+  router.get('/run/:uid', async (req, res) => {
+    const runs = await Run.query()
+      .findOne({ 'runs.uid': req.params.uid })
+      .where({ 'runs.organization': tempOrganization })
+      .eager('steps')
+      .omit(Run, ['id', 'organization'])
+      .omit(RunStep, ['id', 'run'])
+      .leftJoin('tests', function () {
+        this.on('runs.test', '=', 'tests.uid')
+      })
+      .select([
+        'runs.uid',
+        'runs.test',
+        { 'test_name': 'tests.name' },
+        { 'test_purpose': 'tests.purpose' },
+        'runs.created',
+        'runs.status',
+        'runs.browser',
+        'runs.urlDomain',
+        'runs.start',
+        'runs.end']);
+    res.send(runs);
+  });
+
+  router.post('/test/:uid/run', async (req, res) => {
+    const insert = await Run.query().insert(
+      {
+        organization: tempOrganization,
+        test: req.params.uid,
+        browser: req.body.browser,
+        urlDomain: req.body.urlDomain
+      });
+    const runsResult = await Run.query()
+      .findById(insert.id)
+      .where({ organization: tempOrganization })
+      .omit(Run, ['id', 'organization'])
+    res.send(runsResult);
+  });
+
+  router.post('/collection/:uid/run', async (req, res) => {
+    // Get a list of all tests from this collection
+    const collections = await Collection.query()
+      .findOne({ uid: req.params.uid })
+      .where({ organization: tempOrganization })
+      .eager('tests');
+
+    console.log(collections.tests);
+
+    var output = [];
+    for (var c = 0; c < collections.tests.length; c++) {
+      var collection = collections.tests[c];
+      var insert = await Run.query().insert(
+        {
+          organization: tempOrganization,
+          test: collection.test,
+          browser: collection.browser,
+          urlDomain: collection.urlDomain
+        });
+      var runsResult = await Run.query()
+        .findById(insert.id)
+        .where({ organization: tempOrganization })
+        .omit(Run, ['id', 'organization'])
+      output.push(runsResult);
+    }
+    res.send(output)
+  });
+
+  router.delete('/run/:uid', async (req, res) => {
+    const numberOfDeletedRows = await Run.query()
+      .delete()
+      .where('uid', req.params.uid)
+      .where({ organization: tempOrganization });
+    res.send({ numberOfDeletedRows: numberOfDeletedRows });
+  });
 
 
 };

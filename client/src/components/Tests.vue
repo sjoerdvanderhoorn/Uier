@@ -29,15 +29,15 @@
         </thead>
         <tbody>
           <template v-for="test in tests">
-            <tr v-bind:key="test._id">
+            <tr v-bind:key="test.uid">
               <td>
-                <router-link :to="'/test/' + test._id">{{ test.name }}</router-link><br/>
+                <router-link :to="'/test/' + test.uid">{{ test.name }}</router-link><br/>
                 <span class="text-muted">{{test.purpose}}</span>
               </td>
-              <td>{{test.steps.length}}</td>
+              <td>{{test.stepCount}}</td>
               <td>pass/fail?</td>
               <td>
-                <button class="btn btn-danger" title="Remove" v-on:click="removeTest(test._id)">x</button>
+                <button class="btn btn-danger" title="Remove" v-on:click="removeTest(test.uid)">x</button>
               </td>
             </tr>
           </template>
@@ -188,7 +188,7 @@ export default {
           return response.json();
         })
         .then(function(json) {
-          parent.$router.push("/test/" + json._id);
+          parent.$router.push("/test/" + json.uid);
         });
     },
     removeTest: function(testId) {

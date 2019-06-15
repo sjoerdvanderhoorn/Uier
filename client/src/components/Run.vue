@@ -37,7 +37,7 @@
         </tbody>
       </table>
       <button class="btn btn-primary" v-on:click="runTest();">Run again</button>
-      <router-link :to="'/test/' + test._id" tag="button" class="btn btn-secondary">Go to test</router-link>
+      <router-link :to="'/test/' + test.uid" tag="button" class="btn btn-secondary">Go to test</router-link>
     </div>
 
     <div class="alert alert-primary" v-if="run.steps.length == 0">Run pending...</div>
@@ -105,10 +105,9 @@ export default {
       commands: require("../../../runner/src/commands.js"),
       // User data
       test: {
-        _id: "",
+        uid: "",
         name: "",
-        purpose: "",
-        urlPath: ""
+        purpose: ""
       },
       run: {
         created: "",
@@ -139,10 +138,9 @@ export default {
         })
         .then(function(json) {
           // Load test details
-          parent.test._id = json.test._id;
-          parent.test.name = json.test.name;
-          parent.test.purpose = json.test.purpose;
-          parent.test.urlPath = json.test.urlPath;
+          parent.test.uid = json.test;
+          parent.test.name = json.test_name;
+          parent.test.purpose = json.test_purpose;
           // Load run details
           parent.run.created = json.created;
           parent.run.status = json.status;
@@ -183,7 +181,7 @@ export default {
         browser: this.run.browser,
         urlDomain: this.run.urlDomain
       };
-      fetch("http://localhost:8081/test/" + this.test._id + "/run", {
+      fetch("http://localhost:8081/test/" + this.test.uid + "/run", {
         credentials: "same-origin",
         method: "POST",
         body: JSON.stringify(data),

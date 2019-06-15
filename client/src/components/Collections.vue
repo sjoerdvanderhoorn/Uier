@@ -27,17 +27,17 @@
         </thead>
         <tbody>
           <template v-for="collection in collections">
-            <tr v-bind:key="collection._id">
+            <tr v-bind:key="collection.uid">
               <td>
-                <router-link :to="'/collection/' + collection._id">{{ collection.name }}</router-link><br/>
+                <router-link :to="'/collection/' + collection.uid">{{ collection.name }}</router-link><br/>
               <span class="text-muted">{{collection.description}}</span>
               </td>
-              <td>{{collection.tests.length}}</td>
+              <td>{{collection.testCount}}</td>
               <td>
                 <button
                   class="btn btn-danger"
                   title="Remove"
-                  v-on:click="removeCollection(collection._id)"
+                  v-on:click="removeCollection(collection.uid)"
                 >x</button>
               </td>
             </tr>
@@ -156,7 +156,7 @@ export default {
           return response.json();
         })
         .then(function(json) {
-          parent.$router.push("/collection/" + json._id);
+          parent.$router.push("/collection/" + json.uid);
         });
     },
     removeCollection: function(collectionId) {

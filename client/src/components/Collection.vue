@@ -84,8 +84,8 @@
                     <select class="form-control" v-model="test.test">
                       <option
                         v-for="testDetails in tests"
-                        v-bind:key="testDetails._id"
-                        v-bind:value="testDetails._id"
+                        v-bind:key="testDetails.uid"
+                        v-bind:value="testDetails.uid"
                       >{{testDetails.name}}</option>
                     </select>
                     <div class="input-group-append">
@@ -111,7 +111,7 @@
                         class="btn btn-outline-secondary"
                         type="button"
                         title="Use Domain from test."
-                        v-on:click="test.urlDomain=tests.find(t=>t._id==test.test).urlDomain"
+                        v-on:click="test.urlDomain=tests.find(t=>t.uid==test.test).urlDomain"
                       >&#128203;</button>
                     </div>
                   </div>
@@ -131,7 +131,7 @@
                         class="btn btn-outline-secondary"
                         type="button"
                         title="Use Browser from test."
-                        v-on:click="test.browser=tests.find(t=>t._id==test.test).browser;"
+                        v-on:click="test.browser=tests.find(t=>t.uid==test.test).browser;"
                       >&#128203;</button>
                     </div>
                   </div>
