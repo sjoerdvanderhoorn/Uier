@@ -4,7 +4,7 @@
   "description": "REST API to connect client and runner.",
   "main": "index.js",
   "scripts": {
-	  "seed": "knex migrate:latest && knex seed:run",
+    "seed": "knex migrate:latest && knex seed:run",
     "dev": "knex migrate:latest && node ./node_modules/nodemon/bin/nodemon.js src/app.js",
     "start": "npm run dev",
     "test": "echo \"Error: no test specified\" && exit 1"
