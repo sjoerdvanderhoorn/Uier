@@ -1,5 +1,7 @@
 exports.seed = knex => {
-    return knex('organizations').del()
+    return knex('users_roles').del()
+    .then(function(){knex('users').del()})
+    .then(function(){knex('organizations').del()})
     .then(function () {
       return knex("organizations").insert([
         {
@@ -9,7 +11,6 @@ exports.seed = knex => {
         }
       ])
     }).then(function () {
-  
       return knex("users").insert([
         {
           id: 1,

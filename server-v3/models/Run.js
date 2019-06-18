@@ -21,6 +21,7 @@ class Run extends Model {
         status: { type: 'string' },
         browser: { type: 'string' },
         urlDomain: { type: 'string' },
+        urlPath: { type: 'string' },
         start: { type: 'timestamp' },
         end: { type: 'timestamp' }
       }

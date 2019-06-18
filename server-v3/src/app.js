@@ -17,12 +17,14 @@ const knex = Knex(knexConfig.development);
 Model.knex(knex);
 
 const router = promiseRouter()
-  .use(cors());
+  .use(cors())
+
 const app = express()
-  .use(bodyParser.json())
+  //.use(bodyParser.json())
+  .use(bodyParser.json({ limit: "50mb", extended: true })) // Extend to avoid "PayloadTooLargeError" and ensure screenshots can be saved
   .use(morgan('dev'))
   .use(router)
-  .set('json spaces', 2);
+  .set('json spaces', 2)
 
 // Register our REST API.
 registerApi(router);

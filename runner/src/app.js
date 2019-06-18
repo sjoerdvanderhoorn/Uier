@@ -5,11 +5,13 @@ var loop = {
     newRun: async function(run) {
         console.log("Running", run.uid);
         // Set status to "running"
+        run.status = "running";
+        run.start = new Date();
         fetch("http://localhost:8081/run/" + run.uid, {
             method: "PATCH",
             body: JSON.stringify({
-                status: "running",
-                start: new Date()
+                status: run.status,
+                start: run.date
             }),
             headers: {
                 "Content-Type": "application/json"
@@ -32,13 +34,13 @@ var loop = {
     checkNewRun: function() {
         fetch("http://localhost:8081/run/next")
             .then(function(response) {
-                return response.text();
+                return response.json();
             })
             .then(async function(run) {
                 // Process runs
-                if (run.length > 0) {
+                if (run.uid) {
                     // Execute
-                    await loop.newRun(JSON.parse(run));
+                    await loop.newRun(run);
                 }
             })
             .catch(function(error) {

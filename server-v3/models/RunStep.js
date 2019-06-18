@@ -19,7 +19,10 @@ class RunStep extends Model {
         command: { type: 'string' },
         target_query: { type: 'string' },
         target_type: { type: 'string' },
-        value: { type: 'string' }
+        value: { type: 'string' },
+        passed: { type: 'boolean' },
+        error: { type: 'string' },
+        screenshot: { type: 'string' }
       }
     };
   }

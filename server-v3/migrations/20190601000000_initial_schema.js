@@ -175,6 +175,7 @@ exports.up = knex => {
         table.string('status').notNull().defaultTo('new');
         table.string('browser').notNull();
         table.string('urlDomain').notNull();
+        table.string('urlPath');
         table.timestamp('start');
         table.timestamp('end');
       }),
@@ -199,6 +200,9 @@ exports.up = knex => {
         table.string('target_query');
         table.string('target_type');
         table.string('value');
+        table.boolean('passed');
+        table.string('error');
+        table.string('screenshot');
       }),
 
 

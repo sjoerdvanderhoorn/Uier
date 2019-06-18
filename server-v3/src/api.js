@@ -209,7 +209,6 @@ module.exports = router => {
     const graph = req.body;
     graph.id = collections.id;
     graph.organization = tempOrganization;
-    console.log(graph)
     // Update
     const insertedGraph = await transaction(Collection.knex(), trx => {
       return (
@@ -259,33 +258,34 @@ module.exports = router => {
   });
 
   router.get('/run/next', async (req, res) => {
-    var runs = await Run.query().where({ status: "new" }).first()
-    runs.steps = await TestStep.query()
-    //.findOne({ 'runs.uid': req.params.uid })
-    //.where({ 'runs.organization': tempOrganization })
-    //.eager('steps')
-    //.omit(Run, ['id', 'organization'])
-    //.omit(RunStep, ['id', 'run'])
-    /*
-    .leftJoin('tests', function () {
-      this.on('runs.test', '=', 'tests.uid')
-    })
-    */
-    /*
-    .select([
-      'runs.id',
-      'runs.organization',
-      'runs.uid',
-      'runs.test',
-      { 'test_name': 'tests.name' },
-      { 'test_purpose': 'tests.purpose' },
-      'runs.created',
-      'runs.status',
-      'runs.browser',
-      'runs.urlDomain',
-      'runs.start',
-      'runs.end']);
-      */
+    var runs = await Run.query()
+      .where({ status: "new" })
+      .first()
+      .leftJoin('tests', function () {
+        this.on('runs.test', '=', 'tests.uid');
+      })
+      .select([
+        'runs.uid',
+        'runs.test',
+        'runs.created',
+        'runs.status',
+        'runs.browser',
+        'runs.urlDomain',
+        'tests.urlPath',
+        'runs.start',
+        'runs.end'])
+      .omit(Run, ['id', 'organization'])
+    if (runs) {
+      runs.steps = await TestStep.query()
+        .join('tests', function () {
+          this.on('tests_steps.test', '=', 'tests.id');
+        })
+        .where({ 'tests.uid': runs.test })
+        .omit(TestStep, ['id', 'test'])
+    }
+    else {
+      runs = {};
+    }
     res.send(runs);
   });
 
@@ -293,7 +293,10 @@ module.exports = router => {
     const runs = await Run.query().findOne({ uid: req.params.uid });
     let updatedRuns;
     if (runs) {
-      await runs.$query().patchAndFetch({ status: req.body.status, start: req.body.start });
+      await runs.$query().patchAndFetch({
+        status: req.body.status,
+        start: req.body.start
+      });
       updatedRuns = { message: "Run started." }
     }
     else {
@@ -347,9 +350,6 @@ module.exports = router => {
       .findOne({ uid: req.params.uid })
       .where({ organization: tempOrganization })
       .eager('tests');
-
-    console.log(collections.tests);
-
     var output = [];
     for (var c = 0; c < collections.tests.length; c++) {
       var collection = collections.tests[c];
@@ -367,6 +367,28 @@ module.exports = router => {
       output.push(runsResult);
     }
     res.send(output)
+  });
+
+  router.put('/run/:uid', async (req, res) => {
+    // Find current run ID
+    const runs = await Run.query()
+      .findOne({ uid: req.params.uid })
+      .select('id')
+    // Create update object
+    const graph = req.body;
+    graph.id = runs.id;
+    // Update
+    const insertedGraph = await transaction(Run.knex(), trx => {
+      return (
+        Run.query(trx)
+          .findOne({ uid: req.params.uid })
+          .allowUpsert('[steps]')
+          .upsertGraph(graph, {})
+          .omit(Run, ['id', 'organization'])
+          .omit(RunStep, ['id', 'test'])
+      );
+    });
+    res.send(insertedGraph);
   });
 
   router.delete('/run/:uid', async (req, res) => {

@@ -27,11 +27,11 @@ module.exports = {
             .setFirefoxService(firefoxServiceBuilder)
             .build();
         // Navigate to start URL
-        await driver.get(run.urlDomain + run.test.urlPath);
+        await driver.get(run.urlDomain + run.urlPath);
         // Loop over steps
-        for (var i = 0; i < run.test.steps.length; i++) {
+        for (var i = 0; i < run.steps.length; i++) {
             // Start
-            var step = run.test.steps[i];
+            var step = run.steps[i];
             // Log
             console.log(i, step.command);
             // Process commands
@@ -40,13 +40,13 @@ module.exports = {
                     await driver.get(step.value);
                 }
                 if (step.command == "click") {
-                    await driver.findElement(getLocator(step.target)).click();
+                    await driver.findElement(getLocator(step.target_type, step.target_query)).click();
                 }
                 if (step.command == "clickText") {
-                    await driver.findElement(getLocator(step.target)).click();
+                    await driver.findElement(getLocator(step.target_type, step.target_query)).click();
                 }
                 if (step.command == "input") {
-                    await driver.findElement(getLocator(step.target)).sendKeys(step.value);
+                    await driver.findElement(getLocator(step.target_type, step.target_query)).sendKeys(step.value);
                 }
                 if (step.command == "assertTitle") {
                     var title = await driver.getTitle();
@@ -71,7 +71,7 @@ module.exports = {
                 return await exit({ status: "fail" });
             }
             // If this was the last step, exit
-            if (i + 1 == run.test.steps.length) {
+            if (i + 1 == run.steps.length) {
                 console.log("DONE");
                 return await exit({ status: "pass" });
             }
@@ -85,9 +85,9 @@ module.exports = {
             return await results;
         }
 
-        function getLocator(target) {
+        function getLocator(target_type, target_query) {
             var element = {};
-            element[target.type] = target.query;
+            element[target_type] = target_query;
             return element;
         }
     }
