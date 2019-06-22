@@ -13,5 +13,5 @@ yarn-error.log*
 *.ntvs*
 *.njsproj
 *.sln
-server-v3/data/database/uier.db
+server/data/database/uier.db
 settings.js
