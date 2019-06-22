@@ -12,8 +12,9 @@
           class="btn btn-primary"
           data-toggle="modal"
           data-target="#addTest"
+          v-if="$root.$data.roles.includes('test_add')"
         >Add Test</button>
-        <button class="btn btn-secondary">Run all tests</button>
+        <button class="btn btn-secondary" v-if="$root.$data.roles.includes('test_run')">Run all tests</button>
       </div>
 
       <div v-if="error" class="alert alert-warning">Error: {{ error }}</div>
@@ -38,7 +39,7 @@
               <td>{{test.stepCount}}</td>
               <td>pass/fail?</td>
               <td>
-                <button class="btn btn-danger" title="Remove" v-on:click="removeTest(test.uid)">x</button>
+                <button class="btn btn-danger" title="Remove" v-on:click="removeTest(test.uid)" v-if="$root.$data.roles.includes('test_delete')">x</button>
               </td>
             </tr>
           </template>
@@ -164,9 +165,12 @@ export default {
       var parent = this;
       this.error = this.tests = null;
       this.loading = true;
-      fetch("http://localhost:8081/test", { credentials: "include" })
+      this.$parent.request("http://localhost:8081/test")
         .then(function(response) {
           parent.loading = false;
+          if (response.status == 401) {
+            location.reload();
+          }
           return response.json();
         })
         .then(function(json) {
@@ -187,8 +191,7 @@ export default {
         urlDomain: this.addTestTemplate.urlDomain,
         urlPath: this.addTestTemplate.urlPath
       };
-      fetch("http://localhost:8081/test", {
-        credentials: "include",
+      this.$parent.request("http://localhost:8081/test", {
         method: "POST",
         body: JSON.stringify(data),
         headers: new Headers({
@@ -205,10 +208,8 @@ export default {
     removeTest: function(testId) {
       if (window.confirm("Are you sure you want to remove this test?")) {
         var parent = this;
-        fetch("http://localhost:8081/test/" + testId, {
-          credentials: "include",
+        this.$parent.request("http://localhost:8081/test/" + testId, {
           method: "DELETE",
-          body: "",
           headers: new Headers({
             "Content-Type": "application/json"
           })

@@ -18,15 +18,31 @@
         >{{test.urlDomain}}{{test.urlPath}}</a>
       </p>
 
-      <button class="btn btn-primary" v-on:click="saveData();">Save Changes</button>
-      <button class="btn btn-secondary" v-on:click="runTest();">Run test</button>
+      <button
+        class="btn btn-primary"
+        v-on:click="saveData();"
+        v-if="$root.$data.roles.includes('test_update')"
+      >Save Changes</button>
+      <button
+        class="btn btn-secondary"
+        v-on:click="runTest();"
+        v-if="$root.$data.roles.includes('test_run')"
+      >Run test</button>
       <!-- Button trigger modal -->
       <button
         type="button"
         class="btn btn-secondary"
         data-toggle="modal"
         data-target="#editDetails"
+        v-if="$root.$data.roles.includes('test_update')"
       >Edit Details</button>
+      <button
+        type="button"
+        class="btn btn-secondary"
+        data-toggle="modal"
+        data-target="#editDetails"
+        v-if="!$root.$data.roles.includes('test_update')"
+      >View Details</button>
     </div>
 
     <!-- Edit Test Details -->
@@ -139,17 +155,19 @@
                     v-bind:class="{'btn-info': movingRow==null || movingRow==stepNumber, 'btn-warning': movingRow!=null && movingRow!=stepNumber}"
                     :title="movingRow==null ? 'Move' : 'Move to this position'"
                     v-on:click="moveStep(stepNumber)"
+                    v-if="$root.$data.roles.includes('test_update')"
                   >=</button>
                   <button
                     class="btn btn-danger"
                     title="Remove"
                     v-on:click="removeStep(stepNumber)"
+                    v-if="$root.$data.roles.includes('test_update')"
                   >x</button>
                 </td>
               </tr>
               <tr
                 v-bind:key="stepNumber+'_detail'"
-                v-if="stepNumber==activeStep && movingRow==null"
+                v-if="stepNumber==activeStep && movingRow==null && $root.$data.roles.includes('test_update')"
               >
                 <td colspan="4">
                   <div class="container">
@@ -273,7 +291,11 @@
           </tbody>
         </table>
         <div class="mb-3">
-          <button class="btn btn-light float-right" v-on:click="addStep()">+ Add Step</button>
+          <button
+            class="btn btn-light float-right"
+            v-on:click="addStep()"
+            v-if="$root.$data.roles.includes('test_update')"
+          >+ Add Step</button>
         </div>
       </div>
 
@@ -379,9 +401,8 @@ export default {
       var parent = this;
       this.error = null;
       this.loading = true;
-      fetch("http://localhost:8081/test/" + this.$route.params.id, {
-        credentials: "include"
-      })
+      this.$parent
+        .request("http://localhost:8081/test/" + this.$route.params.id)
         .then(function(response) {
           parent.loading = false;
           return response.json();
@@ -410,16 +431,17 @@ export default {
         urlPath: this.test.urlPath,
         steps: this.test.steps
       };
-      fetch("http://localhost:8081/test/" + this.$route.params.id, {
-        credentials: "include",
-        method: "PUT",
-        body: JSON.stringify(data),
-        headers: new Headers({
-          "Content-Type": "application/json"
+      this.$parent
+        .request("http://localhost:8081/test/" + this.$route.params.id, {
+          method: "PUT",
+          body: JSON.stringify(data),
+          headers: new Headers({
+            "Content-Type": "application/json"
+          })
         })
-      }).then(function(response) {
-        parent.$router.push("/tests");
-      });
+        .then(function(response) {
+          parent.$router.push("/tests");
+        });
     },
     runTest() {
       var parent = this;
@@ -427,16 +449,24 @@ export default {
         browser: this.test.browser,
         urlDomain: this.test.urlDomain
       };
-      fetch("http://localhost:8081/test/" + this.$route.params.id + "/run", {
-        credentials: "include",
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: new Headers({
-          "Content-Type": "application/json"
-        })
-      }).then(function(response) {
-        parent.$router.push("/runs");
-      });
+      this.$parent
+        .request(
+          "http://localhost:8081/test/" + this.$route.params.id + "/run",
+          {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: new Headers({
+              "Content-Type": "application/json"
+            })
+          }
+        )
+        .then(function(response) {
+          if (parent.$root.$data.roles.includes("run_read")) {
+            parent.$router.push("/runs");
+          } else {
+            alert("Test was scheduled to run.")
+          }
+        });
     },
     stepDepth: function(stepNumber) {
       var depth = 0;

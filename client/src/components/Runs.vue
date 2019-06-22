@@ -6,7 +6,7 @@
         <p class="lead">Overview of all runs.</p>
         <hr class="my-4">
         <p></p>
-        <button class="btn btn-secondary">Cancel all runs</button>
+        <button class="btn btn-secondary" v-if="$root.$data.roles.includes('run_update')">Cancel all runs</button>
       </div>
 
       <div v-if="error" class="alert alert-warning">Error: {{ error }}</div>
@@ -51,7 +51,7 @@
                 >{{run.status}}</span>
               </td>
               <td>
-                <button class="btn btn-danger" title="Remove" v-on:click="removeRun(run.uid)">x</button>
+                <button class="btn btn-danger" title="Remove" v-on:click="removeRun(run.uid)" v-if="$root.$data.roles.includes('run_delete')">x</button>
               </td>
             </tr>
           </template>
@@ -95,7 +95,7 @@ export default {
       var parent = this;
       // this.error = this.runs = null;
       this.loading = true;
-      fetch("http://localhost:8081/run", { credentials: "include" })
+      this.$parent.request("http://localhost:8081/run")
         .then(function(response) {
           parent.loading = false;
           parent.error = null;
@@ -113,10 +113,8 @@ export default {
     removeRun: function(runId) {
       if (window.confirm("Are you sure you want to remove this run?")) {
         var parent = this;
-        fetch("http://localhost:8081/run/" + runId, {
-          credentials: "include",
+        this.$parent.request("http://localhost:8081/run/" + runId, {
           method: "DELETE",
-          body: "",
           headers: new Headers({
             "Content-Type": "application/json"
           })

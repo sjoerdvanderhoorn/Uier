@@ -28,7 +28,7 @@
           </tr>
           <tr>
             <td>Browser</td>
-            <td>{{browsers[run.browser].name}}</td>
+            <td>{{(run.browser ? browsers[run.browser].name : '')}}</td>
           </tr>
           <tr>
             <td>Duration</td>
@@ -36,8 +36,8 @@
           </tr>
         </tbody>
       </table>
-      <button class="btn btn-primary" v-on:click="runTest();">Run again</button>
-      <router-link :to="'/test/' + test.uid" tag="button" class="btn btn-secondary">Go to test</router-link>
+      <button class="btn btn-primary" v-on:click="runTest();" v-if="$root.$data.roles.includes('test_run')">Run again</button>
+      <router-link :to="'/test/' + test.uid" tag="button" class="btn btn-secondary" v-if="$root.$data.roles.includes('collection_update')">Go to test</router-link>
     </div>
 
     <div class="alert alert-primary" v-if="run.steps.length == 0">Run pending...</div>
@@ -139,9 +139,7 @@ export default {
       var parent = this;
       this.error = null;
       this.loading = true;
-      fetch("http://localhost:8081/run/" + this.$route.params.id, {
-        credentials: "include"
-      })
+      this.$parent.request("http://localhost:8081/run/" + this.$route.params.id)
         .then(function(response) {
           parent.loading = false;
           return response.json();
@@ -171,7 +169,7 @@ export default {
         .replace(
           "{target}",
           "<strong>" +
-            (step.target && step.target.query ? step.target.query : "(...)") +
+            (step.target_query ? step.target_query : "(...)") +
             "</strong>"
         )
         .replace(
@@ -191,8 +189,7 @@ export default {
         browser: this.run.browser,
         urlDomain: this.run.urlDomain
       };
-      fetch("http://localhost:8081/test/" + this.test.uid + "/run", {
-        credentials: "include",
+      this.$parent.request("http://localhost:8081/test/" + this.test.uid + "/run", {
         method: "POST",
         body: JSON.stringify(data),
         headers: new Headers({

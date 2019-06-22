@@ -9,8 +9,16 @@
       <p class="lead">{{collection.description}}</p>
       <hr class="my-4">
 
-      <button class="btn btn-primary" v-on:click="saveData();">Save Changes</button>
-      <button class="btn btn-secondary" v-on:click="runCollection();">Run collection</button>
+      <button
+        class="btn btn-primary"
+        v-on:click="saveData();"
+        v-if="$root.$data.roles.includes('collection_update')"
+      >Save Changes</button>
+      <button
+        class="btn btn-secondary"
+        v-on:click="runCollection();"
+        v-if="$root.$data.roles.includes('collection_run')"
+      >Run collection</button>
       <!-- Button trigger modal -->
       <button
         type="button"
@@ -88,7 +96,7 @@
                         v-bind:value="testDetails.uid"
                       >{{testDetails.name}}</option>
                     </select>
-                    <div class="input-group-append">
+                    <div class="input-group-append" v-if="$root.$data.roles.includes('test_read')">
                       <router-link
                         :to="'/test/' + test.test"
                         tag="button"
@@ -150,11 +158,13 @@
                     v-bind:class="{'btn-info': movingRow==null || movingRow==testNumber, 'btn-warning': movingRow!=null && movingRow!=testNumber}"
                     :title="movingRow==null ? 'Move' : 'Move to this position'"
                     v-on:click="moveTest(testNumber)"
+                    v-if="$root.$data.roles.includes('collection_update')"
                   >=</button>
                   <button
                     class="btn btn-danger"
                     title="Remove"
                     v-on:click="removeTest(testNumber)"
+                    v-if="$root.$data.roles.includes('collection_update')"
                   >x</button>
                 </td>
               </tr>
@@ -162,7 +172,11 @@
           </tbody>
         </table>
         <div class="mb-3">
-          <button class="btn btn-light float-right" v-on:click="addTest()">+ Add Test</button>
+          <button
+            class="btn btn-light float-right"
+            v-on:click="addTest()"
+            v-if="$root.$data.roles.includes('collection_update')"
+          >+ Add Test</button>
         </div>
       </div>
     </div>
@@ -212,9 +226,8 @@ export default {
       var parent = this;
       this.error = null;
       this.loading = true;
-      fetch("http://localhost:8081/collection/" + this.$route.params.id, {
-        credentials: "include"
-      })
+      this.$parent
+        .request("http://localhost:8081/collection/" + this.$route.params.id)
         .then(function(response) {
           parent.loading = false;
           return response.json();
@@ -229,7 +242,8 @@ export default {
           parent.loading = false;
           parent.error = error.toString();
         });
-      fetch("http://localhost:8081/test/", { credentials: "include" })
+      this.$parent
+        .request("http://localhost:8081/test_lookup/")
         .then(function(response) {
           parent.loading = false;
           return response.json();
@@ -250,31 +264,37 @@ export default {
         description: this.collection.description,
         tests: this.collection.tests
       };
-      fetch("http://localhost:8081/collection/" + this.$route.params.id, {
-        credentials: "include",
-        method: "PUT",
-        body: JSON.stringify(data),
-        headers: new Headers({
-          "Content-Type": "application/json"
-        })
-      }).then(function(response) {
-        parent.$router.push("/collections");
-      });
-    },
-    runCollection() {
-      var parent = this;
-      fetch(
-        "http://localhost:8081/collection/" + this.$route.params.id + "/run",
-        {
-          credentials: "include",
-          method: "POST",
+      this.$parent
+        .request("http://localhost:8081/collection/" + this.$route.params.id, {
+          method: "PUT",
+          body: JSON.stringify(data),
           headers: new Headers({
             "Content-Type": "application/json"
           })
-        }
-      ).then(function(response) {
-        parent.$router.push("/runs");
-      });
+        })
+        .then(function(response) {
+          parent.$router.push("/collections");
+        });
+    },
+    runCollection() {
+      var parent = this;
+      this.$parent
+        .request(
+          "http://localhost:8081/collection/" + this.$route.params.id + "/run",
+          {
+            method: "POST",
+            headers: new Headers({
+              "Content-Type": "application/json"
+            })
+          }
+        )
+        .then(function(response) {
+          if (parent.$root.$data.roles.includes("run_read")) {
+            parent.$router.push("/runs");
+          } else {
+            alert("Collection was scheduled to run.");
+          }
+        });
     },
     addTest: function() {
       this.collection.tests.push({

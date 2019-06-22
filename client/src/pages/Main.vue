@@ -13,7 +13,7 @@
       >-->
       <ul class="navbar-nav px-3">
         <li class="nav-item text-nowrap">
-          <a class="nav-link" href="#">Sign out</a>
+          <a class="nav-link" v-on:click="logout()">Sign out</a>
         </li>
       </ul>
     </nav>
@@ -23,23 +23,28 @@
         <!-- Sidebar -->
         <nav class="col-md-2 d-none d-md-block bg-light sidebar">
           <div class="sidebar-sticky">
+            <!--
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <router-link to="/" exact class="nav-link" active-class="active">
+                  <span data-feather="home"></span> Dashboard
+                </router-link>
+              </li>
+            </ul>
+            -->
             <h6
               class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted"
+              v-if="$root.$data.roles.includes('test_read') || $root.$data.roles.includes('collection_read')"
             >
               <span>Definition</span>
             </h6>
             <ul class="nav flex-column">
-              <!-- <li class="nav-item">
-                <router-link to="/" exact class="nav-link" active-class="active">
-                  <span data-feather="home"></span> Dashboard
-                </router-link>
-              </li>-->
-              <li class="nav-item">
+              <li class="nav-item" v-if="$root.$data.roles.includes('test_read')">
                 <router-link to="/tests" class="nav-link" active-class="active">
                   <span data-feather="box"></span> Tests
                 </router-link>
               </li>
-              <li class="nav-item">
+              <li class="nav-item" v-if="$root.$data.roles.includes('collection_read')">
                 <router-link to="/collections" class="nav-link" active-class="active">
                   <span data-feather="codesandbox"></span> Collections
                 </router-link>
@@ -47,11 +52,12 @@
             </ul>
             <h6
               class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted"
+              v-if="$root.$data.roles.includes('run_read')"
             >
               <span>Execution</span>
             </h6>
             <ul class="nav flex-column">
-              <li class="nav-item">
+              <li class="nav-item" v-if="$root.$data.roles.includes('run_read')">
                 <router-link to="/runs" class="nav-link" active-class="active">
                   <span data-feather="git-commit"></span> Runs
                 </router-link>
@@ -162,7 +168,47 @@
 export default {
   name: "Main",
   mounted() {},
-  methods: {}
+  methods: {
+    logout() {
+      var parent = this;
+      fetch("http://localhost:8081/logout", {
+        credentials: "include",
+        method: "POST",
+        headers: new Headers({
+          "Content-Type": "application/json"
+        })
+      })
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(json) {
+          if (json.status == "not_authenticated") {
+            parent.$root.$data.isAuthenticated = false;
+          }
+        });
+    },
+    request(url, options) {
+      var parent = this;
+      // Set options that apply to all requests
+      if (!options) {
+        options = {};
+      }
+      options.credentials = "include";
+      // Route all data requests through this function
+      return fetch(url, options).then(function(response) {
+        // Test if user is still authenticated
+        if (response.status == 401) {
+          window.alert("It looks like you are no longer signed on.");
+          parent.$root.$data.isAuthenticated = false;
+        } else if (!response.ok) {
+          // Some other error happened
+          window.alert("Error fetching data:\n" + response.statusText);
+        } else {
+          return response;
+        }
+      });
+    }
+  }
 };
 </script>
 

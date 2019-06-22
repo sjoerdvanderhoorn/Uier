@@ -12,6 +12,7 @@
           class="btn btn-primary"
           data-toggle="modal"
           data-target="#addCollection"
+          v-if="$root.$data.roles.includes('collection_add')"
         >Add Collection</button>
       </div>
 
@@ -39,6 +40,7 @@
                   class="btn btn-danger"
                   title="Remove"
                   v-on:click="removeCollection(collection.uid)"
+                  v-if="$root.$data.roles.includes('collection_delete')"
                 >x</button>
               </td>
             </tr>
@@ -124,7 +126,7 @@ export default {
       var parent = this;
       // this.error = this.runs = null;
       this.loading = true;
-      fetch("http://localhost:8081/collection", { credentials: "include" })
+      this.$parent.request("http://localhost:8081/collection")
         .then(function(response) {
           parent.loading = false;
           parent.error = null;
@@ -145,8 +147,7 @@ export default {
         name: this.addCollectionTemplate.name,
         description: this.addCollectionTemplate.description
       };
-      fetch("http://localhost:8081/collection", {
-        credentials: "include",
+      this.$parent.request("http://localhost:8081/collection", {
         method: "POST",
         body: JSON.stringify(data),
         headers: new Headers({
@@ -163,8 +164,7 @@ export default {
     removeCollection: function(collectionId) {
       if (window.confirm("Are you sure you want to remove this collection?")) {
         var parent = this;
-        fetch("http://localhost:8081/collection/" + collectionId, {
-          credentials: "include",
+        this.$parent.request("http://localhost:8081/collection/" + collectionId, {
           method: "DELETE",
           body: "",
           headers: new Headers({

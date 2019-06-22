@@ -21,6 +21,7 @@
         required
       >
       <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+      <p class="mt-2 text-danger" v-if="error">{{error}}</p>
       <p class="mt-2 text-muted">
         <a href="#">Reset password</a>
       </p>
@@ -35,7 +36,8 @@ export default {
   data() {
     return {
       email: "admin@uier.com",
-      password: "password"
+      password: "password",
+      error: null
     };
   },
   mounted() {},
@@ -59,8 +61,14 @@ export default {
           return response.json();
         })
         .then(function(json) {
-          if (json.status == "success" || json.status == "already logged on") {
-            parent.$root.$data.login();
+          if (json.status == "authenticated") {
+            parent.$root.$data.user = json.user;
+            parent.$root.$data.roles = json.roles;
+            parent.$root.$data.isAuthenticated = true;
+          } else {
+            parent.password = "";
+            parent.error = "Bad email address or password, or no account exists.";
+            parent.password.focus();
           }
         });
     }

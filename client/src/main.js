@@ -16,12 +16,9 @@ Vue.config.productionTip = false
 
 var data = {
     // Store client side properties
-    isAuthenticated: false,
+    isAuthenticated: null,
     user: {},
-    roles: {},
-    login: function () {
-        data.isAuthenticated = true;
-    }
+    roles: {}
 }
 
 /* eslint-disable no-new */
