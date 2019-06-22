@@ -83,8 +83,16 @@
               class="alert alert-danger"
               role="alert"
             >{{run.steps[activeStep].error}}</div>
-            <button class="btn btn-secondary" v-on:click="activeStep--" :disabled="activeStep==0">Previous</button>
-            <button class="btn btn-secondary" v-on:click="activeStep++" :disabled="activeStep+1 > run.steps.length">Next</button>
+            <button
+              class="btn btn-secondary"
+              v-on:click="activeStep--"
+              :disabled="activeStep==0"
+            >Previous</button>
+            <button
+              class="btn btn-secondary"
+              v-on:click="activeStep++"
+              :disabled="activeStep+1 > run.steps.length"
+            >Next</button>
           </div>
         </div>
       </div>
@@ -131,7 +139,9 @@ export default {
       var parent = this;
       this.error = null;
       this.loading = true;
-      fetch("http://localhost:8081/run/" + this.$route.params.id)
+      fetch("http://localhost:8081/run/" + this.$route.params.id, {
+        credentials: "include"
+      })
         .then(function(response) {
           parent.loading = false;
           return response.json();
@@ -182,7 +192,7 @@ export default {
         urlDomain: this.run.urlDomain
       };
       fetch("http://localhost:8081/test/" + this.test.uid + "/run", {
-        credentials: "same-origin",
+        credentials: "include",
         method: "POST",
         body: JSON.stringify(data),
         headers: new Headers({

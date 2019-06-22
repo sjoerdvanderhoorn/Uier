@@ -32,7 +32,9 @@ Uier consists out of three individual pilars that communicate with each other th
 
 ## Setup
 
-Install all npm dependencies by running the below batch file.
+1. Copy the `settings.example.js` file to `settings.js` and adjust where required.
+
+2. Install all npm dependencies by running the below batch file.
 
 ```bash
 npm-install.cmd

@@ -1,8 +1,12 @@
+const settings = require('../../settings');
+const bcrypt = require('bcrypt');
 const fetch = require('node-fetch');
 const runner = require("./runner.js");
 
+console.log(settings.shared.runner_secret)
+
 var loop = {
-    newRun: async function(run) {
+    newRun: async function (run) {
         console.log("Running", run.uid);
         // Set status to "running"
         run.status = "running";
@@ -14,6 +18,7 @@ var loop = {
                 start: run.date
             }),
             headers: {
+                "x-runner": bcrypt.hashSync(settings.shared.runner_secret, 10),
                 "Content-Type": "application/json"
             }
         });
@@ -27,30 +32,36 @@ var loop = {
             method: "PUT",
             body: JSON.stringify(run),
             headers: {
+                "x-runner": bcrypt.hashSync(settings.shared.runner_secret, 10),
                 "Content-Type": "application/json"
             }
         });
     },
-    checkNewRun: function() {
-        fetch("http://localhost:8081/run/next")
-            .then(function(response) {
+    checkNewRun: function () {
+        fetch("http://localhost:8081/run/next", {
+            headers:
+            {
+                "x-runner": bcrypt.hashSync(settings.shared.runner_secret, 10)
+            }
+        })
+            .then(function (response) {
                 return response.json();
             })
-            .then(async function(run) {
+            .then(async function (run) {
                 // Process runs
                 if (run.uid) {
                     // Execute
                     await loop.newRun(run);
                 }
             })
-            .catch(function(error) {
+            .catch(function (error) {
                 console.log(error.toString());
             });
         // Wait for next run
         loop.checkNewRunTimeout();
     },
-    checkNewRunTimeout: function() {
-        setTimeout(function() { loop.checkNewRun(); }, 5000);
+    checkNewRunTimeout: function () {
+        setTimeout(function () { loop.checkNewRun(); }, 5000);
     }
 }
 

@@ -212,7 +212,9 @@ export default {
       var parent = this;
       this.error = null;
       this.loading = true;
-      fetch("http://localhost:8081/collection/" + this.$route.params.id)
+      fetch("http://localhost:8081/collection/" + this.$route.params.id, {
+        credentials: "include"
+      })
         .then(function(response) {
           parent.loading = false;
           return response.json();
@@ -227,7 +229,7 @@ export default {
           parent.loading = false;
           parent.error = error.toString();
         });
-      fetch("http://localhost:8081/test/")
+      fetch("http://localhost:8081/test/", { credentials: "include" })
         .then(function(response) {
           parent.loading = false;
           return response.json();
@@ -249,7 +251,7 @@ export default {
         tests: this.collection.tests
       };
       fetch("http://localhost:8081/collection/" + this.$route.params.id, {
-        credentials: "same-origin",
+        credentials: "include",
         method: "PUT",
         body: JSON.stringify(data),
         headers: new Headers({
@@ -264,7 +266,7 @@ export default {
       fetch(
         "http://localhost:8081/collection/" + this.$route.params.id + "/run",
         {
-          credentials: "same-origin",
+          credentials: "include",
           method: "POST",
           headers: new Headers({
             "Content-Type": "application/json"

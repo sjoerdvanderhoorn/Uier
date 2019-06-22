@@ -29,8 +29,9 @@
           <template v-for="collection in collections">
             <tr v-bind:key="collection.uid">
               <td>
-                <router-link :to="'/collection/' + collection.uid">{{ collection.name }}</router-link><br/>
-              <span class="text-muted">{{collection.description}}</span>
+                <router-link :to="'/collection/' + collection.uid">{{ collection.name }}</router-link>
+                <br>
+                <span class="text-muted">{{collection.description}}</span>
               </td>
               <td>{{collection.testCount}}</td>
               <td>
@@ -123,7 +124,7 @@ export default {
       var parent = this;
       // this.error = this.runs = null;
       this.loading = true;
-      fetch("http://localhost:8081/collection")
+      fetch("http://localhost:8081/collection", { credentials: "include" })
         .then(function(response) {
           parent.loading = false;
           parent.error = null;
@@ -145,7 +146,7 @@ export default {
         description: this.addCollectionTemplate.description
       };
       fetch("http://localhost:8081/collection", {
-        credentials: "same-origin",
+        credentials: "include",
         method: "POST",
         body: JSON.stringify(data),
         headers: new Headers({
@@ -163,7 +164,7 @@ export default {
       if (window.confirm("Are you sure you want to remove this collection?")) {
         var parent = this;
         fetch("http://localhost:8081/collection/" + collectionId, {
-          credentials: "same-origin",
+          credentials: "include",
           method: "DELETE",
           body: "",
           headers: new Headers({

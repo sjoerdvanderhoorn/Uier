@@ -14,3 +14,4 @@ yarn-error.log*
 *.njsproj
 *.sln
 server-v3/data/database/uier.db
+settings.js

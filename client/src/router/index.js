@@ -1,5 +1,6 @@
 import Vue from "vue"
 import Router from "vue-router"
+// Pages
 import Dashboard from "@/components/Dashboard"
 import About from "@/components/About"
 import Help from "@/components/Help"
@@ -15,8 +16,9 @@ Vue.use(Router)
 const PageNotFound = { template: "<div>Page not found</div>" }
 
 export default new Router({
-    mode: "history", // Instead of "hash"
-    routes: [{
+    mode: "history",
+    routes: [
+        {
             path: "/",
             name: "Dashboard",
             component: Dashboard

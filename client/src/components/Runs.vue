@@ -4,7 +4,7 @@
       <div class="jumbotron">
         <h1 class="display-4">Runs</h1>
         <p class="lead">Overview of all runs.</p>
-            <hr class="my-4">
+        <hr class="my-4">
         <p></p>
         <button class="btn btn-secondary">Cancel all runs</button>
       </div>
@@ -29,11 +29,13 @@
                 <router-link :to="'/run/' + run.uid">{{run.created.replace("T", " ").substr(0,19)}}</router-link>
               </td>
               <td>
-                {{run.test_name}}<br/>
+                {{run.test_name}}
+                <br>
                 <span class="text-muted">{{run.test_purpose}}</span>
               </td>
               <td>
-                {{browsers[run.browser].name}}<br/>
+                {{browsers[run.browser].name}}
+                <br>
                 <span class="text-muted">{{run.urlDomain}}</span>
               </td>
               <td>
@@ -93,7 +95,7 @@ export default {
       var parent = this;
       // this.error = this.runs = null;
       this.loading = true;
-      fetch("http://localhost:8081/run")
+      fetch("http://localhost:8081/run", { credentials: "include" })
         .then(function(response) {
           parent.loading = false;
           parent.error = null;
@@ -112,7 +114,7 @@ export default {
       if (window.confirm("Are you sure you want to remove this run?")) {
         var parent = this;
         fetch("http://localhost:8081/run/" + runId, {
-          credentials: "same-origin",
+          credentials: "include",
           method: "DELETE",
           body: "",
           headers: new Headers({

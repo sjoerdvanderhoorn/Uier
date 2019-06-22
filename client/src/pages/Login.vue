@@ -1,6 +1,6 @@
 <template>
-  <div id="app">
-    <form class="form-signin">
+  <div id="login">
+    <form class="form-signin" @submit.prevent="login">
       <img class="mb-4" src="/static/logo.png" alt width="72" height="72">
       <h1 class="h3 mb-3 font-weight-normal">Log on to Uier</h1>
       <input
@@ -8,6 +8,7 @@
         id="inputEmail"
         class="form-control"
         placeholder="Email address"
+        v-model="email"
         required
         autofocus
       >
@@ -16,10 +17,13 @@
         id="inputPassword"
         class="form-control"
         placeholder="Password"
+        v-model="password"
         required
       >
       <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-      <p class="mt-2 text-muted"><a href="#">Reset password</a></p>
+      <p class="mt-2 text-muted">
+        <a href="#">Reset password</a>
+      </p>
       <p class="mt-5 text-muted">&nbsp;</p>
     </form>
   </div>
@@ -27,23 +31,51 @@
 
 <script>
 export default {
-  name: "App",
-  mounted() {}
+  name: "Login",
+  data() {
+    return {
+      email: "admin@uier.com",
+      password: "password"
+    };
+  },
+  mounted() {},
+  methods: {
+    login() {
+      var parent = this;
+      fetch(
+        "http://localhost:8081/login?username=" +
+          this.email +
+          "&password=" +
+          this.password,
+        {
+          credentials: "include",
+          method: "POST",
+          headers: new Headers({
+            "Content-Type": "application/json"
+          })
+        }
+      )
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(json) {
+          if (json.status == "success" || json.status == "already logged on") {
+            parent.$root.$data.login();
+          }
+        });
+    }
+  }
 };
 </script>
 
 <style>
-html,
-body {
+#login {
+  text-align: center;
+  width: 100%;
   height: 100%;
 }
 
-#app {
-  text-align: center;
-  width: 100%;
-}
-
-body {
+#login {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-align: center;
@@ -51,6 +83,11 @@ body {
   padding-top: 40px;
   padding-bottom: 40px;
   background-color: #f5f5f5;
+}
+
+body {
+  display: -ms-flexbox;
+  display: flex;
 }
 
 .form-signin {

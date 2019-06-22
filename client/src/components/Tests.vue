@@ -31,7 +31,8 @@
           <template v-for="test in tests">
             <tr v-bind:key="test.uid">
               <td>
-                <router-link :to="'/test/' + test.uid">{{ test.name }}</router-link><br/>
+                <router-link :to="'/test/' + test.uid">{{ test.name }}</router-link>
+                <br>
                 <span class="text-muted">{{test.purpose}}</span>
               </td>
               <td>{{test.stepCount}}</td>
@@ -83,25 +84,35 @@
                   <span class="input-group-text" style="width: 8em;">Browser</span>
                 </div>
                 <select class="form-control" v-model="addTestTemplate.browser">
-                    <option
-                      v-for="(browser, browsername) in browsers"
-                      v-bind:key="browsername"
-                      v-bind:value="browsername"
-                      v-bind:selected="browsername==addTestTemplate.browser"
-                    >{{browser.name}}</option>
-                  </select>
+                  <option
+                    v-for="(browser, browsername) in browsers"
+                    v-bind:key="browsername"
+                    v-bind:value="browsername"
+                    v-bind:selected="browsername==addTestTemplate.browser"
+                  >{{browser.name}}</option>
+                </select>
               </div>
               <div class="input-group mb-3">
                 <div class="input-group-prepend">
                   <span class="input-group-text" style="width: 8em;">URL Domain</span>
                 </div>
-                <input type="text" class="form-control" placeholder="https://www.mydomain.com/" v-model="addTestTemplate.urlDomain">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="https://www.mydomain.com/"
+                  v-model="addTestTemplate.urlDomain"
+                >
               </div>
               <div class="input-group mb-3">
                 <div class="input-group-prepend">
                   <span class="input-group-text" style="width: 8em;">URL Path</span>
                 </div>
-                <input type="text" class="form-control" placeholder="/folder/index.php" v-model="addTestTemplate.urlPath">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="/folder/index.php"
+                  v-model="addTestTemplate.urlPath"
+                >
               </div>
             </div>
           </div>
@@ -153,7 +164,7 @@ export default {
       var parent = this;
       this.error = this.tests = null;
       this.loading = true;
-      fetch("http://localhost:8081/test")
+      fetch("http://localhost:8081/test", { credentials: "include" })
         .then(function(response) {
           parent.loading = false;
           return response.json();
@@ -177,7 +188,7 @@ export default {
         urlPath: this.addTestTemplate.urlPath
       };
       fetch("http://localhost:8081/test", {
-        credentials: "same-origin",
+        credentials: "include",
         method: "POST",
         body: JSON.stringify(data),
         headers: new Headers({
@@ -195,7 +206,7 @@ export default {
       if (window.confirm("Are you sure you want to remove this test?")) {
         var parent = this;
         fetch("http://localhost:8081/test/" + testId, {
-          credentials: "same-origin",
+          credentials: "include",
           method: "DELETE",
           body: "",
           headers: new Headers({

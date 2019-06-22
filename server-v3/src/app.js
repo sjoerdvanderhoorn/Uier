@@ -1,6 +1,8 @@
+const settings = require('../../settings');
 const Knex = require('knex');
 const morgan = require('morgan');
 const express = require('express');
+const session = require('express-session');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const promiseRouter = require('express-promise-router');
@@ -17,12 +19,22 @@ const knex = Knex(knexConfig.development);
 Model.knex(knex);
 
 const router = promiseRouter()
-  .use(cors())
+  .use(cors({
+    origin: settings.shared.client_url,
+    allowedHeaders: ['Set-Cookie', 'Cookie', 'Content-Type', 'Authorization', 'Access-Control-Allow-Credentials', 'Access-Control-Allow-Origin', 'Host', 'Origin', 'Referer'],
+    credentials: true,
+  }))
 
 const app = express()
-  //.use(bodyParser.json())
   .use(bodyParser.json({ limit: "50mb", extended: true })) // Extend to avoid "PayloadTooLargeError" and ensure screenshots can be saved
   .use(morgan('dev'))
+  .use(session({
+    name: "uier",
+    secret: settings.shared.server_session_secret,
+    resave: true,
+    saveUninitialized: false,
+    // store: new FileStore(), //https://github.com/valery-barysok/session-file-store/blob/master/examples/express-example/app.js
+  }))
   .use(router)
   .set('json spaces', 2)
 
@@ -42,6 +54,6 @@ app.use((err, req, res, next) => {
   }
 });
 
-const server = app.listen(8081, () => {
+const server = app.listen(settings.shared.server_port, () => {
   console.log('Example app listening at port %s', server.address().port);
 });
