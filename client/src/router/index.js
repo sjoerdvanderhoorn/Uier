@@ -2,14 +2,16 @@ import Vue from "vue"
 import Router from "vue-router"
 // Pages
 import Dashboard from "@/components/Dashboard"
-import About from "@/components/About"
-import Help from "@/components/Help"
 import Tests from "@/components/Tests"
 import Test from "@/components/Test"
 import Runs from "@/components/Runs"
 import Run from "@/components/Run"
 import Collections from "@/components/Collections"
 import Collection from "@/components/Collection"
+import Users from "@/components/Users"
+import User from "@/components/User"
+import About from "@/components/About"
+import Help from "@/components/Help"
 
 Vue.use(Router)
 
@@ -17,8 +19,7 @@ const PageNotFound = { template: "<div>Page not found</div>" }
 
 export default new Router({
     mode: "history",
-    routes: [
-        {
+    routes: [{
             path: "/",
             name: "Dashboard",
             component: Dashboard
@@ -52,6 +53,16 @@ export default new Router({
             path: "/collection/:id",
             name: "Collection",
             component: Collection
+        },
+        {
+            path: "/users",
+            name: "Users",
+            component: Users
+        },
+        {
+            path: "/user/:id",
+            name: "User",
+            component: User
         },
         {
             path: "/about",

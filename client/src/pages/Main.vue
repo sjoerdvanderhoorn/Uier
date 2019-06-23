@@ -62,14 +62,22 @@
                   <span data-feather="git-commit"></span> Runs
                 </router-link>
               </li>
+            </ul>
+            <h6
+              class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted"
+              v-if="$root.$data.roles.includes('user_read')"
+            >
+              <span>Administrative</span>
+            </h6>
+            <ul class="nav flex-column">
+              <li class="nav-item" v-if="$root.$data.roles.includes('user_read')">
+                <router-link to="/users/" class="nav-link" active-class="active">
+                  <span data-feather="users"></span> Users
+                </router-link>
+              </li>
               <!--<li class="nav-item">
                 <router-link to="/timers/" class="nav-link" active-class="active">
                   <span data-feather="clock"></span> Timers
-                </router-link>
-              </li>
-              <li class="nav-item">
-                <router-link to="/users/" class="nav-link" active-class="active">
-                  <span data-feather="users"></span> Users
                 </router-link>
               </li>
               <li class="nav-item">
@@ -83,7 +91,6 @@
                 </router-link>
               </li>-->
             </ul>
-
             <h6
               class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted"
             >
@@ -101,62 +108,11 @@
                 </router-link>
               </li>
             </ul>
-
-            <!-- <h6
-              class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted"
-            >
-              <span>Saved reports</span>
-              <a class="d-flex align-items-center text-muted" href="#">
-                <span data-feather="plus-circle"></span>
-              </a>
-            </h6>
-            <ul class="nav flex-column mb-2">
-              <li class="nav-item">
-                <a class="nav-link" href="#">
-                  <span data-feather="file-text"></span>
-                  Current month
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">
-                  <span data-feather="file-text"></span>
-                  Last quarter
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">
-                  <span data-feather="file-text"></span>
-                  Social engagement
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">
-                  <span data-feather="file-text"></span>
-                  Year-end sale
-                </a>
-              </li>
-            </ul>-->
           </div>
         </nav>
 
         <!-- routes will be rendered here -->
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
-          <!-- <div
-            class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
-          >
-            <h1 class="h2">Page name: {{$route.name}}</h1>
-            <div class="btn-toolbar mb-2 mb-md-0">
-              <div class="btn-group mr-2">
-                <button class="btn btn-sm btn-outline-secondary">Share</button>
-                <button class="btn btn-sm btn-outline-secondary">Export</button>
-              </div>
-              <button class="btn btn-sm btn-outline-secondary dropdown-toggle">
-                <span data-feather="calendar"></span>
-                This week
-              </button>
-            </div>
-          </div>-->
-
           <router-view/>
         </main>
       </div>
@@ -198,7 +154,7 @@ export default {
       return fetch(url, options).then(function(response) {
         // Test if user is still authenticated
         if (response.status == 401) {
-          window.alert("It looks like you are no longer signed on.");
+          window.alert("It looks like you either do not have permission to perform this action, or that you are no longer logged in.");
           parent.$root.$data.isAuthenticated = false;
         } else if (!response.ok) {
           // Some other error happened

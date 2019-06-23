@@ -243,7 +243,7 @@ export default {
           parent.error = error.toString();
         });
       this.$parent
-        .request("http://localhost:8081/test_lookup/")
+        .request("http://localhost:8081/test_dropdown")
         .then(function(response) {
           parent.loading = false;
           return response.json();

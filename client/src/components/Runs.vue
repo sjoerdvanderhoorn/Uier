@@ -6,7 +6,7 @@
         <p class="lead">Overview of all runs.</p>
         <hr class="my-4">
         <p></p>
-        <button class="btn btn-secondary" v-if="$root.$data.roles.includes('run_update')">Cancel all runs</button>
+        <button class="btn btn-secondary" v-if="$root.$data.roles.includes('run_cancel')">Cancel all runs</button>
       </div>
 
       <div v-if="error" class="alert alert-warning">Error: {{ error }}</div>
