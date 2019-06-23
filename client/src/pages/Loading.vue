@@ -3,7 +3,10 @@
     <div class="loading-container">
       <img src="/static/logo.png" id="loading-image" alt width="200" height="200">
       <div class="loading-text" v-if="!errorMessage">Please wait as Uier loads...</div>
-      <div class="error-text" v-if="errorMessage">Could not connect to server. Reload this page to try again.</div>
+      <div
+        class="error-text"
+        v-if="errorMessage"
+      >Could not connect to server. Trying again in fifteen seconds. You can also reload this page to try again.</div>
       <div class="text-muted" v-if="errorMessage">{{errorMessage}}</div>
     </div>
   </div>
@@ -24,7 +27,7 @@ export default {
     checkIfAuthenticated() {
       // Check if already authenticated
       var parent = this;
-      fetch("http://localhost:8081/authenticatedX", {
+      fetch("http://localhost:8081/authenticated", {
         credentials: "include",
         method: "POST",
         headers: new Headers({
@@ -45,6 +48,9 @@ export default {
         })
         .catch(function(error) {
           parent.errorMessage = error.message;
+          window.setTimeout(function() {
+            parent.checkIfAuthenticated();
+          }, 15000);
         });
     }
   }
