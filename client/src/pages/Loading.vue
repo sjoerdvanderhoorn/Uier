@@ -2,7 +2,9 @@
   <div id="loading">
     <div class="loading-container">
       <img src="/static/logo.png" id="loading-image" alt width="200" height="200">
-      <div class="loading-text">Please wait as Uier loads...</div>
+      <div class="loading-text" v-if="!errorMessage">Please wait as Uier loads...</div>
+      <div class="error-text" v-if="errorMessage">Could not connect to server. Reload this page to try again.</div>
+      <div class="text-muted" v-if="errorMessage">{{errorMessage}}</div>
     </div>
   </div>
 </template>
@@ -10,8 +12,42 @@
 <script>
 export default {
   name: "Loading",
-  mounted() {},
-  methods: {}
+  data() {
+    return {
+      errorMessage: null
+    };
+  },
+  mounted() {
+    this.checkIfAuthenticated();
+  },
+  methods: {
+    checkIfAuthenticated() {
+      // Check if already authenticated
+      var parent = this;
+      fetch("http://localhost:8081/authenticatedX", {
+        credentials: "include",
+        method: "POST",
+        headers: new Headers({
+          "Content-Type": "application/json"
+        })
+      })
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(json) {
+          if (json.status == "authenticated") {
+            parent.$root.$data.user = json.user;
+            parent.$root.$data.roles = json.roles;
+            parent.$root.$data.isAuthenticated = true;
+          } else {
+            parent.$root.$data.isAuthenticated = false;
+          }
+        })
+        .catch(function(error) {
+          parent.errorMessage = error.message;
+        });
+    }
+  }
 };
 </script>
 
@@ -51,6 +87,12 @@ body {
 #loading-image {
   -webkit-animation: wobble-hor-bottom 1.4s 2s infinite both;
   animation: wobble-hor-bottom 1.4s 2s infinite both;
+}
+.error-text {
+  padding-top: 40px;
+  font-weight: 400;
+  font-size: 16px;
+  color: red;
 }
 
 /* ----------------------------------------------

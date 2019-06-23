@@ -140,10 +140,9 @@ module.exports = router => {
     });
 
     router.delete('/user/:uid', (req, res, next) => checkPermission(req, res, next, "user_delete"), async(req, res) => {
-        const numberOfDeletedRows = await User.query().delete().where('uid', req.params.uid);
+        const numberOfDeletedRows = await User.query().delete().where('uid', req.params.uid).where({ organization: req.session.organization });
         res.send({ numberOfDeletedRows: numberOfDeletedRows });
     });
-
 
     // --- Test ---
 
