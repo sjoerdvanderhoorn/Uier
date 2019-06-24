@@ -10,7 +10,7 @@
       <table class="table table-striped">
         <tbody>
           <tr>
-            <td>Status</td>
+            <td style="width: 7em;">Status</td>
             <td>
               <span
                 class="badge badge-pill"
@@ -19,7 +19,7 @@
             </td>
           </tr>
           <tr>
-            <td style="width: 7em;">Test</td>
+            <td>Test</td>
             <td>{{test.name}}</td>
           </tr>
           <tr>

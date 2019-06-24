@@ -14,7 +14,10 @@
           data-target="#addTest"
           v-if="$root.$data.roles.includes('test_add')"
         >Add Test</button>
-        <button class="btn btn-secondary" v-if="$root.$data.roles.includes('test_run')">Run all tests</button>
+        <button
+          class="btn btn-secondary"
+          v-if="$root.$data.roles.includes('test_run')"
+        >Run all tests</button>
       </div>
 
       <div v-if="error" class="alert alert-warning">Error: {{ error }}</div>
@@ -37,9 +40,21 @@
                 <span class="text-muted">{{test.purpose}}</span>
               </td>
               <td>{{test.stepCount}}</td>
-              <td>pass/fail?</td>
               <td>
-                <button class="btn btn-danger" title="Remove" v-on:click="removeTest(test.uid)" v-if="$root.$data.roles.includes('test_delete')">x</button>
+                <router-link :to="'/run/' + test.run_uid">
+                  <span
+                    class="badge badge-pill"
+                    v-bind:class="{'badge-success':test.run_status=='pass', 'badge-danger':test.run_status=='fail', 'badge-primary': test.run_status!='pass' && test.run_status != 'fail'}"
+                  >{{test.run_status}}</span>
+                </router-link>
+              </td>
+              <td>
+                <button
+                  class="btn btn-danger"
+                  title="Remove"
+                  v-on:click="removeTest(test.uid)"
+                  v-if="$root.$data.roles.includes('test_delete')"
+                >x</button>
               </td>
             </tr>
           </template>
@@ -165,7 +180,8 @@ export default {
       var parent = this;
       this.error = this.tests = null;
       this.loading = true;
-      this.$parent.request("http://localhost:8081/test")
+      this.$parent
+        .request("http://localhost:8081/test")
         .then(function(response) {
           parent.loading = false;
           if (response.status == 401) {
@@ -191,13 +207,14 @@ export default {
         urlDomain: this.addTestTemplate.urlDomain,
         urlPath: this.addTestTemplate.urlPath
       };
-      this.$parent.request("http://localhost:8081/test", {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: new Headers({
-          "Content-Type": "application/json"
+      this.$parent
+        .request("http://localhost:8081/test", {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: new Headers({
+            "Content-Type": "application/json"
+          })
         })
-      })
         .then(function(response) {
           return response.json();
         })
@@ -208,14 +225,16 @@ export default {
     removeTest: function(testId) {
       if (window.confirm("Are you sure you want to remove this test?")) {
         var parent = this;
-        this.$parent.request("http://localhost:8081/test/" + testId, {
-          method: "DELETE",
-          headers: new Headers({
-            "Content-Type": "application/json"
+        this.$parent
+          .request("http://localhost:8081/test/" + testId, {
+            method: "DELETE",
+            headers: new Headers({
+              "Content-Type": "application/json"
+            })
           })
-        }).then(function(response) {
-          parent.fetchData();
-        });
+          .then(function(response) {
+            parent.fetchData();
+          });
       }
     }
   }

@@ -121,9 +121,14 @@
 </template>
 
 <script>
+import feather from "feather-icons";
+
 export default {
   name: "Main",
-  mounted() {},
+  mounted() {
+    // Show icons
+    feather.replace();
+  },
   methods: {
     logout() {
       var parent = this;

@@ -3,8 +3,8 @@
 const settings = require('../../settings');
 const bcrypt = require('bcrypt');
 const { transaction } = require('objection');
+const { ref } = require('objection');
 
-const Organization = require('../models/Organization');
 const User = require('../models/User');
 const UserRole = require('../models/UserRole');
 const Test = require('../models/Test');
@@ -17,7 +17,7 @@ const RunStep = require('../models/RunStep');
 module.exports = router => {
 
     // --- Authentication ---
-    router.post('/login', async(req, res) => {
+    router.post('/login', async (req, res) => {
         if (!req.query.username || !req.query.password) {
             return res.send({ status: "failed" });
         }
@@ -38,14 +38,14 @@ module.exports = router => {
                 name: users.name,
                 email: users.email
             }
-            req.session.roles = users.roles.map(function(role) { return role.role });
+            req.session.roles = users.roles.map(function (role) { return role.role });
             return res.send({ status: "authenticated", user: req.session.user, roles: req.session.roles });
         } else {
             return res.send({ status: "bad_credentials" });
         }
     });
 
-    router.post('/authenticated', async(req, res) => {
+    router.post('/authenticated', async (req, res) => {
         if (req.session.user) {
             res.send({ status: "authenticated", user: req.session.user, roles: req.session.roles })
         } else {
@@ -53,7 +53,7 @@ module.exports = router => {
         }
     });
 
-    router.post('/logout', async(req, res) => {
+    router.post('/logout', async (req, res) => {
         req.session.destroy();
         res.send({ status: "not_authenticated" });
     });
@@ -61,7 +61,7 @@ module.exports = router => {
 
     // --- User ---
 
-    router.get('/user', (req, res, next) => checkPermission(req, res, next, "user_read"), async(req, res) => {
+    router.get('/user', (req, res, next) => checkPermission(req, res, next, "user_read"), async (req, res) => {
         const users = await User.query()
             .where({ organization: req.session.organization })
             .eager('roles')
@@ -70,7 +70,7 @@ module.exports = router => {
         res.send(users);
     });
 
-    router.get('/user/:uid', (req, res, next) => checkPermission(req, res, next, "user_read"), async(req, res) => {
+    router.get('/user/:uid', (req, res, next) => checkPermission(req, res, next, "user_read"), async (req, res) => {
         const users = await User.query().findOne({ uid: req.params.uid })
             .eager('roles')
             .omit(User, ['id', 'organization', 'password'])
@@ -78,14 +78,14 @@ module.exports = router => {
         res.send(users);
     });
 
-    router.post('/user', (req, res, next) => checkPermission(req, res, next, "user_add"), async(req, res) => {
+    router.post('/user', (req, res, next) => checkPermission(req, res, next, "user_add"), async (req, res) => {
         const graph = req.body;
         graph.organization = req.session.organization;
         const insertedGraph = await transaction(User.knex(), trx => {
             return (
                 User.query(trx)
-                .allowInsert('[roles]')
-                .insertGraph(graph)
+                    .allowInsert('[roles]')
+                    .insertGraph(graph)
             );
         });
         const users = await User.query()
@@ -97,14 +97,14 @@ module.exports = router => {
         res.send(users);
     });
 
-    router.put('/user/:uid', (req, res, next) => checkPermission(req, res, next, "user_update"), async(req, res) => {
+    router.put('/user/:uid', (req, res, next) => checkPermission(req, res, next, "user_update"), async (req, res) => {
         // Allows a user with the right permission to change all details of a user
         // Find current user ID
         const users = await User.query()
             .findOne({ uid: req.params.uid })
             .where({ organization: req.session.organization })
             .select('id')
-            // Create update object
+        // Create update object
         const graph = req.body;
         graph.id = users.id;
         if (!graph.password) {
@@ -115,18 +115,18 @@ module.exports = router => {
         const insertedGraph = await transaction(User.knex(), trx => {
             return (
                 User.query(trx)
-                .findOne({ uid: req.params.uid }).where({ organization: req.session.organization })
-                .omit(User, ['password'])
-                .allowUpsert('[roles]')
-                .upsertGraph(graph, {})
-                .omit(User, ['id', 'organization', 'password'])
-                .omit(UserRole, ['id', 'user'])
+                    .findOne({ uid: req.params.uid }).where({ organization: req.session.organization })
+                    .omit(User, ['password'])
+                    .allowUpsert('[roles]')
+                    .upsertGraph(graph, {})
+                    .omit(User, ['id', 'organization', 'password'])
+                    .omit(UserRole, ['id', 'user'])
             );
         });
         res.send(insertedGraph);
     });
 
-    router.patch('/user/:uid/password', (req, res, next) => checkPermission(req, res, next, "AUTHENTICATED"), async(req, res) => {
+    router.patch('/user/:uid/password', (req, res, next) => checkPermission(req, res, next, "AUTHENTICATED"), async (req, res) => {
         // Allows the logged in user only to change their password.
         const users = await User.query().findOne({ uid: req.params.uid, password: req.body.old });
         let updatedUsers;
@@ -139,54 +139,83 @@ module.exports = router => {
         res.send(updatedUsers);
     });
 
-    router.delete('/user/:uid', (req, res, next) => checkPermission(req, res, next, "user_delete"), async(req, res) => {
+    router.delete('/user/:uid', (req, res, next) => checkPermission(req, res, next, "user_delete"), async (req, res) => {
         const numberOfDeletedRows = await User.query().delete().where('uid', req.params.uid).where({ organization: req.session.organization });
         res.send({ numberOfDeletedRows: numberOfDeletedRows });
     });
 
     // --- Test ---
 
-    router.get('/test', (req, res, next) => checkPermission(req, res, next, "test_read"), async(req, res) => {
+    router.get('/test', (req, res, next) => checkPermission(req, res, next, "test_read"), async (req, res) => {
         const tests = await Test.query()
             .where({ organization: req.session.organization })
             .omit(Test, ['id', 'organization'])
-            .leftJoin('tests_steps', function() {
+            .leftJoin('tests_steps', function () {
                 this.on('tests_steps.test', '=', 'tests.id')
             })
-            .select(['tests.uid', 'tests.name', 'tests.purpose', 'tests.browser', 'tests.urlDomain', 'tests.urlPath'])
+            .select(
+                [
+                    'tests.uid',
+                    'tests.name',
+                    'tests.purpose',
+                    'tests.browser',
+                    'tests.urlDomain',
+                    'tests.urlPath',
+                    Run.query().where({ organization: req.session.organization, test: ref('tests.uid') }).orderBy('created', 'desc').first().select(['uid']).as('run_uid'),
+                    Run.query().where({ organization: req.session.organization, test: ref('tests.uid') }).orderBy('created', 'desc').first().select(['status']).as('run_status')
+                ])
             .groupBy(['tests.uid'])
             .count({ 'stepCount': 'tests_steps.id' })
         res.send(tests);
     });
 
-    router.get('/test_dropdown', (req, res, next) => checkPermission(req, res, next, "collection_read"), async(req, res) => {
+    router.get('/test_dropdown', (req, res, next) => checkPermission(req, res, next, "collection_read"), async (req, res) => {
         // Used to define a collection
         const tests = await Test.query()
             .where({ organization: req.session.organization })
             .omit(Test, ['id', 'organization'])
-            .select(['tests.uid', 'tests.name', 'tests.purpose', 'tests.browser', 'tests.urlDomain', 'tests.urlPath'])
+            .select(
+                [
+                    'tests.uid',
+                    'tests.name',
+                    'tests.purpose',
+                    'tests.browser',
+                    'tests.urlDomain',
+                    'tests.urlPath'
+                ])
             .groupBy(['tests.uid'])
         res.send(tests);
     });
 
-    router.get('/test/:uid', (req, res, next) => checkPermission(req, res, next, "test_read"), async(req, res) => {
+    router.get('/test/:uid', (req, res, next) => checkPermission(req, res, next, "test_read"), async (req, res) => {
         const tests = await Test.query()
             .findOne({ uid: req.params.uid })
             .where({ organization: req.session.organization })
+            .select(
+                [
+                    'tests.uid',
+                    'tests.name',
+                    'tests.purpose',
+                    'tests.browser',
+                    'tests.urlDomain',
+                    'tests.urlPath',
+                    Run.query().where({ organization: req.session.organization, test: ref('tests.uid') }).orderBy('created', 'desc').first().select(['uid']).as('run_uid'),
+                    Run.query().where({ organization: req.session.organization, test: ref('tests.uid') }).orderBy('created', 'desc').first().select(['status']).as('run_status')
+                ])
             .eager('steps')
-            .omit(Test, ['id', 'organization'])
+            .groupBy(['tests.uid'])
             .omit(TestStep, ['id', 'test'])
         res.send(tests);
     });
 
-    router.post('/test', (req, res, next) => checkPermission(req, res, next, "test_add"), async(req, res) => {
+    router.post('/test', (req, res, next) => checkPermission(req, res, next, "test_add"), async (req, res) => {
         const graph = req.body;
         graph.organization = req.session.organization;
         const insertedGraph = await transaction(Test.knex(), trx => {
             return (
                 Test.query(trx)
-                .allowInsert('[steps]')
-                .insertGraph(graph)
+                    .allowInsert('[steps]')
+                    .insertGraph(graph)
             );
         });
         const tests = await Test.query()
@@ -198,13 +227,13 @@ module.exports = router => {
         res.send(tests);
     });
 
-    router.put('/test/:uid', (req, res, next) => checkPermission(req, res, next, "test_update"), async(req, res) => {
+    router.put('/test/:uid', (req, res, next) => checkPermission(req, res, next, "test_update"), async (req, res) => {
         // Find current test ID
         const tests = await Test.query()
             .findOne({ uid: req.params.uid })
             .where({ organization: req.session.organization })
             .select('id')
-            // Create update object
+        // Create update object
         const graph = req.body;
         graph.id = tests.id;
         graph.organization = req.session.organization;
@@ -212,17 +241,17 @@ module.exports = router => {
         const insertedGraph = await transaction(Test.knex(), trx => {
             return (
                 Test.query(trx)
-                .findOne({ uid: req.params.uid }).where({ organization: req.session.organization })
-                .allowUpsert('[steps]')
-                .upsertGraph(graph, {})
-                .omit(Test, ['id', 'organization'])
-                .omit(TestStep, ['id', 'test'])
+                    .findOne({ uid: req.params.uid }).where({ organization: req.session.organization })
+                    .allowUpsert('[steps]')
+                    .upsertGraph(graph, {})
+                    .omit(Test, ['id', 'organization'])
+                    .omit(TestStep, ['id', 'test'])
             );
         });
         res.send(insertedGraph);
     });
 
-    router.delete('/test/:uid', (req, res, next) => checkPermission(req, res, next, "test_delete"), async(req, res) => {
+    router.delete('/test/:uid', (req, res, next) => checkPermission(req, res, next, "test_delete"), async (req, res) => {
         const numberOfDeletedRows = await Test.query()
             .delete()
             .where('uid', req.params.uid)
@@ -233,11 +262,11 @@ module.exports = router => {
 
     // --- Collection ---
 
-    router.get('/collection', (req, res, next) => checkPermission(req, res, next, "collection_read"), async(req, res) => {
+    router.get('/collection', (req, res, next) => checkPermission(req, res, next, "collection_read"), async (req, res) => {
         const collections = await Collection.query()
             .where({ organization: req.session.organization })
             .omit(Collection, ['id', 'organization'])
-            .leftJoin('collections_tests', function() {
+            .leftJoin('collections_tests', function () {
                 this.on('collections_tests.collection', '=', 'collections.id')
             })
             .select(['collections.uid', 'collections.name', 'collections.description'])
@@ -246,7 +275,7 @@ module.exports = router => {
         res.send(collections);
     });
 
-    router.get('/collection/:uid', (req, res, next) => checkPermission(req, res, next, "collection_read"), async(req, res) => {
+    router.get('/collection/:uid', (req, res, next) => checkPermission(req, res, next, "collection_read"), async (req, res) => {
         const collections = await Collection.query()
             .findOne({ 'collections.uid': req.params.uid })
             .where({ 'collections.organization': req.session.organization })
@@ -256,14 +285,14 @@ module.exports = router => {
         res.send(collections);
     });
 
-    router.post('/collection', (req, res, next) => checkPermission(req, res, next, "collection_add"), async(req, res) => {
+    router.post('/collection', (req, res, next) => checkPermission(req, res, next, "collection_add"), async (req, res) => {
         const graph = req.body;
         graph.organization = req.session.organization;
         const insertedGraph = await transaction(Collection.knex(), trx => {
             return (
                 Collection.query(trx)
-                .allowInsert('[tests]')
-                .insertGraph(graph)
+                    .allowInsert('[tests]')
+                    .insertGraph(graph)
             );
         });
         const collections = await Collection.query()
@@ -275,13 +304,13 @@ module.exports = router => {
         res.send(collections);
     });
 
-    router.put('/collection/:uid', (req, res, next) => checkPermission(req, res, next, "collection_update"), async(req, res) => {
+    router.put('/collection/:uid', (req, res, next) => checkPermission(req, res, next, "collection_update"), async (req, res) => {
         // Find current collection ID
         const collections = await Collection.query()
             .findOne({ uid: req.params.uid })
             .where({ organization: req.session.organization })
             .select('id')
-            // Create update object
+        // Create update object
         const graph = req.body;
         graph.id = collections.id;
         graph.organization = req.session.organization;
@@ -289,17 +318,17 @@ module.exports = router => {
         const insertedGraph = await transaction(Collection.knex(), trx => {
             return (
                 Collection.query(trx)
-                .findOne({ uid: req.params.uid }).where({ organization: req.session.organization })
-                .allowUpsert('[tests]')
-                .upsertGraph(graph, {})
-                .omit(Collection, ['id', 'organization'])
-                .omit(CollectionTest, ['id', 'collection'])
+                    .findOne({ uid: req.params.uid }).where({ organization: req.session.organization })
+                    .allowUpsert('[tests]')
+                    .upsertGraph(graph, {})
+                    .omit(Collection, ['id', 'organization'])
+                    .omit(CollectionTest, ['id', 'collection'])
             );
         });
         res.send(insertedGraph);
     });
 
-    router.delete('/collection/:uid', (req, res, next) => checkPermission(req, res, next, "collection_delete"), async(req, res) => {
+    router.delete('/collection/:uid', (req, res, next) => checkPermission(req, res, next, "collection_delete"), async (req, res) => {
         const numberOfDeletedRows = await Collection.query()
             .delete()
             .where('uid', req.params.uid)
@@ -310,11 +339,11 @@ module.exports = router => {
 
     // --- Run ---
 
-    router.get('/run', (req, res, next) => checkPermission(req, res, next, "run_read"), async(req, res) => {
+    router.get('/run', (req, res, next) => checkPermission(req, res, next, "run_read"), async (req, res) => {
         const runs = await Run.query()
             .where({ 'runs.organization': req.session.organization })
             .omit(Run, ['id', 'organization'])
-            .leftJoin('tests', function() {
+            .leftJoin('tests', function () {
                 this.on('runs.test', '=', 'tests.uid')
             })
             .orderBy('runs.created', 'desc')
@@ -334,11 +363,11 @@ module.exports = router => {
         res.send(runs);
     });
 
-    router.get('/run/next', (req, res, next) => checkPermission(req, res, next, "RUNNER"), async(req, res) => {
+    router.get('/run/next', (req, res, next) => checkPermission(req, res, next, "RUNNER"), async (req, res) => {
         var runs = await Run.query()
             .where({ status: "new" })
             .first()
-            .leftJoin('tests', function() {
+            .leftJoin('tests', function () {
                 this.on('runs.test', '=', 'tests.uid');
             })
             .select([
@@ -355,7 +384,7 @@ module.exports = router => {
             .omit(Run, ['id', 'organization'])
         if (runs) {
             runs.steps = await TestStep.query()
-                .join('tests', function() {
+                .join('tests', function () {
                     this.on('tests_steps.test', '=', 'tests.id');
                 })
                 .where({ 'tests.uid': runs.test })
@@ -366,7 +395,7 @@ module.exports = router => {
         res.send(runs);
     });
 
-    router.patch('/run/:uid', (req, res, next) => checkPermission(req, res, next, "RUNNER"), async(req, res) => {
+    router.patch('/run/:uid', (req, res, next) => checkPermission(req, res, next, "RUNNER"), async (req, res) => {
         const runs = await Run.query().findOne({ uid: req.params.uid });
         let updatedRuns;
         if (runs) {
@@ -381,14 +410,14 @@ module.exports = router => {
         res.send(updatedRuns);
     });
 
-    router.get('/run/:uid', (req, res, next) => checkPermission(req, res, next, "run_read"), async(req, res) => {
+    router.get('/run/:uid', (req, res, next) => checkPermission(req, res, next, "run_read"), async (req, res) => {
         const runs = await Run.query()
             .findOne({ 'runs.uid': req.params.uid })
             .where({ 'runs.organization': req.session.organization })
             .eager('steps')
             .omit(Run, ['id', 'organization'])
             .omit(RunStep, ['id', 'run'])
-            .leftJoin('tests', function() {
+            .leftJoin('tests', function () {
                 this.on('runs.test', '=', 'tests.uid')
             })
             .select([
@@ -406,7 +435,7 @@ module.exports = router => {
         res.send(runs);
     });
 
-    router.post('/test/:uid/run', (req, res, next) => checkPermission(req, res, next, "test_run"), async(req, res) => {
+    router.post('/test/:uid/run', (req, res, next) => checkPermission(req, res, next, "test_run"), async (req, res) => {
         const insert = await Run.query().insert({
             organization: req.session.organization,
             test: req.params.uid,
@@ -420,7 +449,7 @@ module.exports = router => {
         res.send(runsResult);
     });
 
-    router.post('/collection/:uid/run', (req, res, next) => checkPermission(req, res, next, "collection_run"), async(req, res) => {
+    router.post('/collection/:uid/run', (req, res, next) => checkPermission(req, res, next, "collection_run"), async (req, res) => {
         // Get a list of all tests from this collection
         const collections = await Collection.query()
             .findOne({ uid: req.params.uid })
@@ -444,29 +473,29 @@ module.exports = router => {
         res.send(output)
     });
 
-    router.put('/run/:uid', (req, res, next) => checkPermission(req, res, next, "RUNNER"), async(req, res) => {
+    router.put('/run/:uid', (req, res, next) => checkPermission(req, res, next, "RUNNER"), async (req, res) => {
         // Find current run ID
         const runs = await Run.query()
             .findOne({ uid: req.params.uid })
             .select('id')
-            // Create update object
+        // Create update object
         const graph = req.body;
         graph.id = runs.id;
         // Update
         const insertedGraph = await transaction(Run.knex(), trx => {
             return (
                 Run.query(trx)
-                .findOne({ uid: req.params.uid })
-                .allowUpsert('[steps]')
-                .upsertGraph(graph, {})
-                .omit(Run, ['id', 'organization'])
-                .omit(RunStep, ['id', 'test'])
+                    .findOne({ uid: req.params.uid })
+                    .allowUpsert('[steps]')
+                    .upsertGraph(graph, {})
+                    .omit(Run, ['id', 'organization'])
+                    .omit(RunStep, ['id', 'test'])
             );
         });
         res.send(insertedGraph);
     });
 
-    router.delete('/run/:uid', (req, res, next) => checkPermission(req, res, next, "run_delete"), async(req, res) => {
+    router.delete('/run/:uid', (req, res, next) => checkPermission(req, res, next, "run_delete"), async (req, res) => {
         const numberOfDeletedRows = await Run.query()
             .delete()
             .where('uid', req.params.uid)

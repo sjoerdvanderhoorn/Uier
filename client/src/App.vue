@@ -17,14 +17,9 @@ import Loading from "@/pages/Loading";
 import Login from "@/pages/Login";
 import Main from "@/pages/Main";
 
-import feather from "feather-icons";
-
 export default {
   name: "App",
-  mounted() {
-    // Show icons
-    feather.replace();
-  },
+  mounted() {},
   components: {
     Loading,
     Login,

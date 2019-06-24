@@ -8,16 +8,35 @@
       <h1 class="display-4">{{test.name}}</h1>
       <p class="lead">{{test.purpose}}</p>
       <hr class="my-4">
-      <p>Browser: {{(browsers[test.browser] ? browsers[test.browser].name : "")}}</p>
-      <p>
-        URL:
-        <a
-          :href="test.urlDomain + test.urlPath"
-          target="_blank"
-          title="Open Default URL in new browser window."
-        >{{test.urlDomain}}{{test.urlPath}}</a>
-      </p>
-
+      <table class="table table-striped">
+        <tbody>
+          <tr>
+            <td style="width: 7em;">URL</td>
+            <td>
+              <a
+                :href="test.urlDomain + test.urlPath"
+                target="_blank"
+                title="Open Default URL in new browser window."
+              >{{test.urlDomain}}{{test.urlPath}}</a>
+            </td>
+          </tr>
+          <tr>
+            <td>Browser</td>
+            <td>{{(browsers[test.browser] ? browsers[test.browser].name : "")}}</td>
+          </tr>
+          <tr>
+            <td>Last Run</td>
+            <td>
+              <router-link :to="'/run/' + test.run_uid">
+                <span
+                  class="badge badge-pill"
+                  v-bind:class="{'badge-success':test.run_status=='pass', 'badge-danger':test.run_status=='fail', 'badge-primary': test.run_status!='pass' && test.run_status != 'fail'}"
+                >{{test.run_status}}</span>
+              </router-link>
+            </td>
+          </tr>
+        </tbody>
+      </table>
       <button
         class="btn btn-primary"
         v-on:click="saveData();"
@@ -414,6 +433,8 @@ export default {
           parent.test.browser = json.browser;
           parent.test.urlDomain = json.urlDomain;
           parent.test.urlPath = json.urlPath;
+          parent.test.run_uid = json.run_uid;
+          parent.test.run_status = json.run_status;
           parent.test.steps = json.steps;
         })
         .catch(function(error) {
@@ -464,7 +485,7 @@ export default {
           if (parent.$root.$data.roles.includes("run_read")) {
             parent.$router.push("/runs");
           } else {
-            alert("Test was scheduled to run.")
+            alert("Test was scheduled to run.");
           }
         });
     },

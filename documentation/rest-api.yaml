@@ -1,0 +1,261 @@
+# https://mermade.github.io/openapi-gui/
+# https://editor.swagger.io/
+openapi: 3.0.0
+servers:
+  - url: 'http://localhost:8081'
+info:
+  description: 'Uier (UI[test]er) is a tool that provides codeless or low-code User Experience test editing and management. Uier uses Selenium to perform testing or UI automation. When running a script, results are fed back to the user interface to visually inspect failures. Each step captures screenshots and the full browser state.'
+  version: 0.3.0
+  title: Uier
+  termsOfService: ''
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+tags:
+  - name: authentication
+  - name: test
+  - name: collection
+  - name: run
+  - name: user
+paths:
+  /login:
+    post:
+      summary: ''
+      description: ''
+      parameters:
+        - name: username
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        default:
+          description: 'Authenticated'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: authenticated
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: uier=abcde12345; Path=/; HttpOnly
+      operationId: ''
+      tags:
+        - authentication
+  /logout:
+    post:
+      summary: ''
+      description: ''
+      parameters: []
+      responses:
+        default:
+          description: 'Not authenticated'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: not_authenticated
+      operationId: ''
+      tags:
+        - authentication
+  /test:
+    get:
+      summary: ''
+      description: ''
+      parameters: []
+      security: 
+        - cookieAuth: []
+      operationId: ''
+      responses:
+        default:
+          description: 'Default response'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TestSchema'
+      tags:
+        - test
+    post:
+      summary: ''
+      description: ''
+      operationId: ''
+      security: 
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TestSchema'
+      responses:
+        default:
+          description: 'Default response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestSchema'
+      tags:
+        - test
+  '/test/{uid}':
+    get:
+      summary: ''
+      description: ''
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          description: Test identifier
+          schema:
+            type: string
+      operationId: ''
+      security: 
+        - cookieAuth: []
+      responses:
+        default:
+          description: 'Default response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestSchema'
+      tags:
+        - test
+    put:
+      summary: ''
+      description: ''
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          description: Test identifier
+          schema:
+            type: string
+      operationId: ''
+      security: 
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TestSchema'
+      responses:
+        default:
+          description: 'Default response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestSchema'
+      tags:
+        - test
+    delete:
+      summary: ''
+      description: ''
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          description: Test identifier
+          schema:
+            type: string
+      operationId: ''
+      security: 
+        - cookieAuth: []
+      responses:
+        default:
+          description: Default response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  numberOfDeletedRows:
+                    type: integer
+      tags:
+        - test
+  '/test/{uid}/run':
+    post:
+      summary: ''
+      description: ''
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          description: Test identifier
+          schema:
+            type: string
+      operationId: ''
+      security: 
+        - cookieAuth: []
+      responses:
+        default:
+          description: 'Default response'
+      tags:
+        - test
+externalDocs:
+  description: 'Uier on GitHub'
+  url: 'https://github.com/sjoerdvanderhoorn/Uier/'
+components:
+  schemas:
+    TestSchema:
+      type: object
+      properties:
+        uid:
+          type: string
+          example: 00000000-0000-0000-0000-000000000000
+        name:
+          type: string
+          example: Google search for 'Selenium HQ'
+        purpose:
+          type: string
+          example: This test will verify Selenium HQ is still on the first reports page of Google.
+        browser:
+          type: string
+          enum: [chrome, firefox]
+        urlDomain:
+          type: string
+          example: https://www.google.com
+        urlPath:
+          type: string
+          example: /
+        steps:
+          type: array
+          items:
+            type: object
+            properties:
+              command:
+                type: string
+                example: input
+              name:
+                type: string
+                example: Enter 'Selenium HQ' as a search string
+              target_query:
+                type: string
+                example: a > h3
+              target_type:
+                type: string
+                example: css
+              value:
+                type: string
+                example: Selenium HQ
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: uier
+  links: {}
+  callbacks: {}
