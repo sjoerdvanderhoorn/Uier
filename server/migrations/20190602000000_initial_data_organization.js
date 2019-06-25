@@ -9,7 +9,7 @@ exports.up = knex => {
             uid: "814e88ac-f2da-4ede-b79e-b4df94be7f45",
             organization: 1,
             email: "admin@uier.com",
-            password: "password",
+            password: "$2b$10$Dj/hmtxNvHD/CeLg5PuhVeM8wv.TC/GKqaJ3C.zvYuitpQud6bk.W",
             name: "Administrator"
         }])
     }).then(function() {

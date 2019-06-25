@@ -10,6 +10,7 @@ import Collections from "@/components/Collections"
 import Collection from "@/components/Collection"
 import Users from "@/components/Users"
 import User from "@/components/User"
+import Password from "@/components/Password"
 import About from "@/components/About"
 import Help from "@/components/Help"
 
@@ -63,6 +64,11 @@ export default new Router({
             path: "/user/:id",
             name: "User",
             component: User
+        },
+        {
+            path: "/password",
+            name: "Password",
+            component: Password
         },
         {
             path: "/about",

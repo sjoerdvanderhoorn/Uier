@@ -67,12 +67,24 @@
               class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted"
               v-if="$root.$data.roles.includes('user_read')"
             >
-              <span>Administrative</span>
+              <span>Administration</span>
             </h6>
             <ul class="nav flex-column">
               <li class="nav-item" v-if="$root.$data.roles.includes('user_read')">
                 <router-link to="/users/" class="nav-link" active-class="active">
                   <span data-feather="users"></span> Users
+                </router-link>
+              </li>
+            </ul>
+            <h6
+              class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted"
+            >
+              <span>Profile</span>
+            </h6>
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <router-link to="/password/" class="nav-link" active-class="active">
+                  <span data-feather="key"></span> Password
                 </router-link>
               </li>
               <!--<li class="nav-item">
@@ -159,8 +171,10 @@ export default {
       return fetch(url, options).then(function(response) {
         // Test if user is still authenticated
         if (response.status == 401) {
-          window.alert("It looks like you either do not have permission to perform this action, or that you are no longer logged in.");
-          parent.$root.$data.isAuthenticated = false;
+          if (window.confirm("It looks like you either do not have permission to perform this action, or that you are no longer signed in.\n\nDo you want to log out and back in to try and resolve the issue?")) {
+            parent.$router.push("/");
+            parent.logout();
+          }
         } else if (!response.ok) {
           // Some other error happened
           window.alert("Error fetching data:\n" + response.statusText);
