@@ -9,13 +9,13 @@ Uier tends to be a free self hostable alternative to **Applitools**, **Endtest**
 # Table of contents
 
 * [Tests](#tests)
-* [User permissions](user-permissions)
-* [Structure](structure)
-* [API documentation](api-documentation)
-* [Prerequisites](prerequisites)
-* [Installation](installation)
-* [Getting Started](getting-started)
-* [Developer Resources](developer-resources)
+* [User permissions](#user-permissions)
+* [Structure](#structure)
+* [API documentation](#api-documentation)
+* [Prerequisites](#prerequisites)
+* [Installation](#installation)
+* [Getting Started](#getting-started)
+* [Developer Resources](#developer-resources)
 
 # Tests
 
