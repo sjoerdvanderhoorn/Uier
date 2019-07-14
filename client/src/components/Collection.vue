@@ -145,11 +145,11 @@
                   </div>
                 </td>
                 <td>
-                  <router-link :to="'/run/' + test.run" title="Go to Run.">
+                  <router-link :to="'/run/' + test.run_uid" title="Go to Run.">
                     <span
                       class="badge badge-pill"
-                      v-bind:class="{'badge-success':test.status=='pass', 'badge-danger':test.status=='fail', 'badge-primary': test.status!='pass' && test.status != 'fail'}"
-                    >{{test.status}}</span>
+                      v-bind:class="{'badge-success':test.run_status=='pass', 'badge-danger':test.run_status=='fail', 'badge-primary': test.run_status!='pass' && test.run_status != 'fail'}"
+                    >{{test.run_status}}</span>
                   </router-link>
                 </td>
                 <td width="100" nowrap>
@@ -262,7 +262,11 @@ export default {
       var data = {
         name: this.collection.name,
         description: this.collection.description,
-        tests: this.collection.tests
+        tests: this.collection.tests.forEach(function(test) {
+          delete test.run_uid;
+          delete test.run_status;
+          return test;
+        })
       };
       this.$parent
         .request("http://localhost:8081/collection/" + this.$route.params.id, {

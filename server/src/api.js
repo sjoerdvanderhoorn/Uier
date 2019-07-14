@@ -85,6 +85,7 @@ module.exports = router => {
             .eager('roles')
             .omit(User, ['id', 'organization', 'password'])
             .omit(UserRole, ['id', 'user'])
+            .orderBy('users.email', 'asc')
         res.send(users);
     });
 
@@ -174,6 +175,7 @@ module.exports = router => {
                 ])
             .groupBy(['tests.uid'])
             .count({ 'stepCount': 'tests_steps.id' })
+            .orderBy('tests.name', 'asc')
         res.send(tests);
     });
 
@@ -280,16 +282,29 @@ module.exports = router => {
             .select(['collections.uid', 'collections.name', 'collections.description'])
             .groupBy(['collections.uid'])
             .count({ 'testCount': 'collections_tests.id' })
+            .orderBy('collections.name', 'asc')
         res.send(collections);
     });
 
     router.get('/collection/:uid', (req, res, next) => checkPermission(req, res, next, "collection_read"), async(req, res) => {
+        // Get collection
         const collections = await Collection.query()
             .findOne({ 'collections.uid': req.params.uid })
             .where({ 'collections.organization': req.session.organization })
-            .eager('tests', 'tests.[tests]')
             .omit(Collection, ['id', 'organization'])
-            .omit(CollectionTest, ['id', 'collection'])
+            // Get tests and their results
+        collections.tests = await CollectionTest.query()
+            .leftJoin('collections', function() {
+                this.on('collections_tests.collection', '=', 'collections.id')
+            })
+            .where({ 'collections.organization': req.session.organization, 'collections.uid': collections.uid })
+            .select([
+                'test',
+                'browser',
+                'urlDomain',
+                Run.query().where({ organization: req.session.organization, test: ref('collections_tests.test'), browser: ref('collections_tests.browser'), urlDomain: ref('collections_tests.urlDomain') }).orderBy('created', 'desc').first().select(['uid']).as('run_uid'),
+                Run.query().where({ organization: req.session.organization, test: ref('collections_tests.test'), browser: ref('collections_tests.browser'), urlDomain: ref('collections_tests.urlDomain') }).orderBy('created', 'desc').first().select(['status']).as('run_status')
+            ])
         res.send(collections);
     });
 

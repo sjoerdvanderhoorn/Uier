@@ -54,6 +54,18 @@ module.exports = {
                         throw "Text not found in title:\n" + title;
                     }
                 }
+                if (step.command == "assertText") {
+                    var html = await driver.executeScript("return document.body.innerText;");
+                    if (!html.includes(step.value)) {
+                        throw "Text not found in page.";
+                    }
+                }
+                if (step.command == "assertValue") {
+                    var value = await driver.findElement(getLocator(step.target_type, step.target_query)).getAttribute("value");
+                    if (!value.includes(step.value)) {
+                        throw "Text not found in field:\n" + value;
+                    }
+                }
                 // Mark step as passed
                 step.passed = true;
             } catch (error) {

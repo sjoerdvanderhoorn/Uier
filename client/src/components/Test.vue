@@ -160,10 +160,12 @@
                   >&nbsp;</div>
                 </td>
                 <td>
+                  <!--
                   <span
                     class="badge badge-warning float-right"
                     v-if="runs[0].step==stepNumber"
                   >{{runs[0].error}}</span>
+                  -->
                   {{step.name}}
                   <br>
                   <span class="text-muted" v-html="commandDescription(stepNumber)"></span>

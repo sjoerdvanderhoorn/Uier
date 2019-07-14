@@ -15,8 +15,9 @@ Uier tends to be a free self hostable alternative to **Applitools**, **Endtest**
 * [Prerequisites](prerequisites)
 * [Installation](installation)
 * [Getting Started](getting-started)
+* [Developer Resources](developer-resources)
 
-## Tests
+# Tests
 
 To facility testing, Uier implements the Selenium browser automation API. The goal of Uier is to become feature compatible with Selenium IDE by implementing all of its [commands](https://www.seleniumhq.org/selenium-ide/docs/en/api/commands/).
 
@@ -28,11 +29,11 @@ In addition to running single tests, tests can also be combined in a collection.
 
 ![Preview of collection](./documentation/screenshot_collection.png)
 
-## User permissions
+# User permissions
 
 Uier is set up with multi user support in mind. When first started, an administrator user is automatically created. From there on, the default password ~can~ should be changed. In addition, create extra user accounts for any team members and fine tune their permissions. For instance, users can be granted access to run a test or collection of tests, but be blocked from authoring any.
 
-## Structure
+# Structure
 
 Uier consists out of three individual pilars that communicate with each other through a REST API.
 
@@ -48,7 +49,7 @@ Uier consists out of three individual pilars that communicate with each other th
   * Runs scripts defined by client and reports back status.
   * Needs to run on a Windows environment.
 
-## API documentation
+# API documentation
 
 All communication between the Uier front end and the database is routed through a REST API. This REST API is also available for end users to automate common or scheduled events, such as running a test or adding users. The API is documented using Swagger.
 
@@ -56,13 +57,13 @@ All communication between the Uier front end and the database is routed through 
 
 > Note that as of version 0.3, the API is not final. Any changes made to the database scheme will receive migration scripts to update all data, but the API might change at any time until version 1.0 is reached.
 
-## Prerequisites
+# Prerequisites
 
 * Windows environment (required for Runner browser drivers)
   * Chrome
   * Firefox
 
-## Installation
+# Installation
 
 1. Download latest from GitHub repository.
 
@@ -74,7 +75,7 @@ All communication between the Uier front end and the database is routed through 
 npm-install.cmd
 ```
 
-## Upgrading
+# Upgrading
 
 1. Download latest from GitHub repository.
 
@@ -84,7 +85,7 @@ npm-install.cmd
 npm-install.cmd
 ```
 
-## Getting Started
+# Getting Started
 
 To run all three services at once, start below batch file. Services can also be started individually.
 
@@ -100,3 +101,8 @@ run-server.cmd
 run-client.cmd
 run-runner.cms
 ```
+
+# Developer Resources
+
+* [Selenium webdriver API](https://seleniumhq.github.io/selenium/docs/api/javascript/index.html)
+* [Selenium IDE commands](https://www.seleniumhq.org/selenium-ide/docs/en/api/commands/)
