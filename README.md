@@ -38,15 +38,15 @@ Uier is set up with multi user support in mind. When first started, an administr
 Uier consists out of three individual pilars that communicate with each other through a REST API.
 
 *  **client**
-    *  HTTP client (port 8080)
-    *  User facing.
+   *  HTTP client (port 8080)
+   *  User facing.
 *  **server**
-    *  REST API server (port 8081)
-    *  Uses SQLite as data storage.
-    *  Facilitates communication between client and runner
+   *  REST API server (port 8081)
+   *  Uses SQLite as data storage.
+   *  Facilitates communication between client and runner
 *  **runner**
-    *  Selenium backend. 
-    *  Runs scripts defined by client and reports back status.
+   *  Selenium backend. 
+   *  Runs scripts defined by client and reports back status.
 
 ## API documentation
 
