@@ -47,7 +47,6 @@ Uier consists out of three individual pilars that communicate with each other th
 * **runner**
   * Selenium backend. 
   * Runs scripts defined by client and reports back status.
-  * Needs to run on a Windows environment.
 
 # API documentation
 
@@ -59,9 +58,12 @@ All communication between the Uier front end and the database is routed through 
 
 # Prerequisites
 
-* Windows environment (required for Runner browser drivers)
-  * Chrome
-  * Firefox
+Uier is cross platform and can run on the main operating systems.
+
+* Windows, Linux, or Mac
+* NodeJS
+* Chrome
+* Firefox
 
 # Installation
 
