@@ -1,0 +1,4 @@
+* http://chromedriver.chromium.org/downloads
+* https://github.com/mozilla/geckodriver/releases
+* https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/
+* https://github.com/operasoftware/operachromiumdriver/releases

@@ -6,11 +6,11 @@ const firefox = require('selenium-webdriver/firefox');
 
 let firefoxOptions = new firefox.Options();
 firefoxOptions.windowSize({ width: 800, height: 600 });
-const firefoxServiceBuilder = new firefox.ServiceBuilder(__dirname + "/../drivers/geckodriver.exe");
+const firefoxServiceBuilder = new firefox.ServiceBuilder(__dirname + "/../drivers/" + process.platform + "/geckodriver.exe");
 
 let chromeOptions = new chrome.Options();
 chromeOptions.windowSize({ width: 800, height: 600 });
-chrome.setDefaultService(new chrome.ServiceBuilder(__dirname + "/../drivers/chromedriver.exe").build());
+chrome.setDefaultService(new chrome.ServiceBuilder(__dirname + "/../drivers/" + process.platform + "/chromedriver.exe").build());
 
 module.exports = {
     run: async function(run) {
